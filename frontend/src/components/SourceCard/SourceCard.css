@@ -1,0 +1,137 @@
+.source-card {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.75rem;
+
+    padding: 1.25rem;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 0.75rem;
+
+    background: #ffffff;
+}
+
+
+/* Citation */
+
+.source-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.5rem;
+
+}
+
+
+.citation-badge {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 1.75rem;
+    height: 1.75rem;
+
+    border-radius: 50%;
+
+    background: #e8f0fe;
+
+    font-size: 0.85rem;
+
+    font-weight: 600;
+
+}
+
+
+.source-label {
+
+    font-size: 0.85rem;
+
+    color: #737373;
+
+}
+
+
+/* Document name */
+
+.source-document {
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    color: #202124;
+
+    line-height: 1.4;
+
+}
+
+
+/* Metadata */
+
+.source-metadata {
+
+    font-size: 0.8rem;
+
+    color: #737373;
+
+}
+
+
+/* Evidence text */
+
+.source-evidence {
+
+    margin-top: 0.25rem;
+
+    padding: 0.75rem;
+
+    background: #f8f9fa;
+
+    border-radius: 0.5rem;
+
+
+    font-size: 0.95rem;
+
+    line-height: 1.65;
+
+    color: #303030;
+
+}
+
+
+/* Future action */
+
+.source-action {
+
+    align-self: flex-start;
+
+    margin-top: 0.25rem;
+
+
+    border: none;
+
+    background: transparent;
+
+    padding: 0;
+
+
+    cursor: pointer;
+
+    color: #2563eb;
+
+    font-size: 0.9rem;
+
+}
+
+.more, .less{
+    font-weight: bold;
+    cursor: pointer;
+}
+

@@ -1,0 +1,51 @@
+.citation {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 0.15rem;
+    padding: 0.1rem 0.45rem;
+
+    border: 1px solid #54a1ff;
+    border-radius: 999px;
+
+    background: #cbdfff;
+
+    color: #00287d;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease,
+        transform 150ms ease;
+
+}
+
+.citation:hover {
+
+    background: #dbeafe;
+
+    border-color: #93c5fd;
+
+    color: #0033be;
+
+}
+
+.citation:active {
+
+    transform: scale(0.96);
+
+}
+
+.citation:focus-visible {
+
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+
+}

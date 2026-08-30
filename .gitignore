@@ -1,0 +1,132 @@
+# =========================
+# Old Project Components
+# =========================
+
+backend-old-node/
+document-service/
+
+
+# =========================
+# Dependencies
+# =========================
+
+node_modules/
+backend/.venv/
+backend/venv/
+
+
+# =========================
+# Environment Variables
+# =========================
+
+.env
+.env.*
+!.env.example
+
+frontend/.env
+backend/.env
+
+
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+
+*.so
+
+.python-version
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+*.egg-info/
+
+
+# =========================
+# Build Outputs
+# =========================
+
+dist/
+build/
+
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# =========================
+# Coverage Reports
+# =========================
+
+coverage/
+
+
+# =========================
+# Cache Files
+# =========================
+
+.cache/
+.parcel-cache/
+.vite/
+.ruff_cache/
+.mypy_cache/
+
+
+# =========================
+# Application Data
+# =========================
+
+uploads/
+storage/
+tmp/
+temp/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+
+# =========================
+# IDE / Editor Files
+# =========================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+# =========================
+# Operating System Files
+# =========================
+
+.DS_Store
+Thumbs.db
+
+
+# =========================
+# Deployment
+# =========================
+
+.render/
+
+
+# =========================
+# Misc
+# =========================
+
+*.pid
+*.seed

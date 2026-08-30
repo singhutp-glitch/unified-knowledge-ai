@@ -1,0 +1,139 @@
+.startup-screen{
+    min-height:100vh;
+    width: 100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:2rem;
+
+    background:#f8fafc;
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+}
+
+.startup-card{
+
+    width:100%;
+    max-width:520px;
+
+    background:white;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:18px;
+
+    padding:3rem 2.5rem;
+
+    text-align:center;
+
+    box-shadow:
+        0 12px 40px rgba(15,23,42,.08);
+}
+
+.startup-logo{
+
+    width:64px;
+    height:64px;
+
+    margin:0 auto 1.5rem;
+
+    border-radius:16px;
+
+    background:#2563eb;
+
+    color:white;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:1.2rem;
+    font-weight:700;
+}
+
+.startup-card h1{
+
+    margin:0;
+
+    color:#0f172a;
+
+    font-size:2rem;
+}
+
+.startup-subtitle{
+
+    margin:.5rem 0 2rem;
+
+    color:#64748b;
+
+    font-size:1rem;
+}
+
+.startup-spinner{
+
+    width:42px;
+    height:42px;
+
+    margin:0 auto 1.5rem;
+
+    border:4px solid #dbeafe;
+    border-top-color:#2563eb;
+
+    border-radius:50%;
+
+    animation:spin .9s linear infinite;
+}
+
+.startup-card h2{
+
+    margin-bottom:.75rem;
+
+    color:#1e293b;
+
+    font-size:1.25rem;
+}
+
+.startup-description{
+
+    color:#64748b;
+
+    line-height:1.6;
+
+    margin-bottom:2rem;
+}
+
+.startup-timer{
+
+    display:inline-flex;
+
+    justify-content:center;
+    align-items:center;
+
+    width:72px;
+    height:72px;
+
+    border-radius:50%;
+
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    font-size:1.4rem;
+    font-weight:700;
+}
+
+@keyframes spin{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+}

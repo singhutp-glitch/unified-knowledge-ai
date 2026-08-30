@@ -1,0 +1,86 @@
+.side-bar{
+    width: 5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    flex-shrink: 0;
+    align-self: stretch;
+
+    background-color: hsl(0, 0%, 97%);
+
+    padding: 1.5rem 1rem;
+
+    overflow: hidden;
+}
+.side-bar.extended{
+    width: 16rem;
+}
+.side-bar img{
+    width: 20px;
+}
+
+.side-bar .menu{
+    display: block;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.side-bar .new-chat{
+    margin-top:50px;
+    display: inline-flex;
+    align-items: center;
+    gap:10px;
+    padding:10px 15px;
+    background-color: hsl(0, 0%, 90%);
+    border-radius: 50px;
+    font-size: 14px;
+    color: gray;
+    cursor: pointer;
+}
+
+.side-bar .recent{
+    display: flex;
+    flex-direction: column;
+}
+
+.side-bar .recent-title{
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.side-bar .recent-entry{
+    display: flex;
+    align-items: start;
+    gap: 10px;
+    padding:10px;
+    padding-right: 40px;
+    border-radius: 50px;
+    color: hsl(0, 0%, 15%);
+    cursor: pointer;
+}
+
+.side-bar .recent-entry:hover{
+    background-color: hsl(0, 0%, 90%);
+}
+
+.side-bar .recent-entry.current-chat{
+    background-color: hsl(0, 0%, 90%);
+}
+.side-bar .bottom{
+    display: flex;
+    flex-direction: column;
+}
+
+.side-bar .bottom-item{
+    padding-right: 0px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.bottom-user-name{
+    font-size: 22px;
+    padding-right: 40px;
+}
