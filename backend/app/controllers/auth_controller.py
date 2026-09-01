@@ -25,6 +25,8 @@ def signup(
             detail="Email already registered"
         )
 
+    password_hash = hash_password(data.password)
+
     user = db_services.create_user(
         data.name,
         data.email,
