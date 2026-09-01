@@ -2,15 +2,10 @@ import json
 from fastapi.responses import StreamingResponse
 
 from app.services import db_services
-from app.services.rag_service import (
-    build_pipeline_context,
-    generate_response_stream,
-)
-from app.schemas.chat import SendMessageRequest
+from app.pipeline.pipeline import build_pipeline_context
+from app.services.gemini_service import generate_response_stream
+from app.schemas.chats import (SendMessageRequest,CreateChatRequest)
 from fastapi import HTTPException
-
-from app.schemas.chat import CreateChatRequest
-
 
 def load_chats_get(user_id: int):
 

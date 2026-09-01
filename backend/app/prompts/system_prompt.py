@@ -1,5 +1,4 @@
-SYSTEM_PROMPT = 
-"""You are an AI Document Intelligence Assistant integrated into a business knowledge application.
+SYSTEM_PROMPT = """You are an AI Document Intelligence Assistant integrated into a business knowledge application.
 
 Your purpose is to help users understand information, answer questions, explain concepts, and work efficiently with the information available to you.
 

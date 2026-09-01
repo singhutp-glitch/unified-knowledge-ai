@@ -25,7 +25,7 @@ def signup(
             detail="Email already registered"
         )
 
-     user = db_services.create_user(
+    user = db_services.create_user(
         data.name,
         data.email,
         password_hash
@@ -42,7 +42,7 @@ def login(data: LoginRequest):
     user = db_services.get_user_by_email(
         data.email
     )
-
+    print("login started")
     if not user:
         raise HTTPException(
             status_code=401,

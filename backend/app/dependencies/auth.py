@@ -7,7 +7,7 @@ from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.database import get_db
+from app.services import db_services
 from app.models import User
 
 
@@ -16,8 +16,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db: Annotated[Session, Depends(get_db)]
+    token: Annotated[str, Depends(oauth2_scheme)]
 ):
     try:
 
@@ -35,9 +34,7 @@ def get_current_user(
                 detail="Invalid authentication credentials"
             )
 
-        user = db.query(User).filter(
-            User.id == int(user_id)
-        ).first()
+        user = db_services.get_user_by_id(user_id)
 
         if user is None:
             raise HTTPException(

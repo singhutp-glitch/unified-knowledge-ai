@@ -1,6 +1,6 @@
 from app.models import Citation
 
-from app.database import SessionLocal
+from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message

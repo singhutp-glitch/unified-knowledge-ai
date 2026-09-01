@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from app.controllers import chat_controller
-from app.dependencies import get_current_user
+from app.controllers import chats_controller
+from app.dependencies.auth import get_current_user
+from app.schemas.chats import CreateChatRequest
 
 
 router = APIRouter(

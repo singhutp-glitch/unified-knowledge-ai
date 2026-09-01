@@ -2,7 +2,7 @@ from google import genai
 from google.genai import types
 
 from app.config import settings
-from app.prompts.chat_prompts import SYSTEM_PROMPT
+from app.prompts.system_prompt import SYSTEM_PROMPT
 
 
 ai = genai.Client(
