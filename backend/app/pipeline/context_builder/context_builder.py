@@ -30,3 +30,4 @@ async def build_context(context):
     }
 
     context["contents"] = contents
+    print('content inside build_context - ',contents)

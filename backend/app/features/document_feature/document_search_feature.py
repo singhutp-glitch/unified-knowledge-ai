@@ -74,9 +74,9 @@ content: {chunk["text"]}
         "sources": context["documentSources"]
     }
 
-    context["stream"].write(
-        json.dumps(source_data) + "\n"
-    )
+    # context["stream"].write(
+    #     json.dumps(source_data) + "\n"
+    # )
 
 
 document_search_feature["should_run"] = should_run

@@ -11,7 +11,7 @@ def load_chats_get(user_id: int):
 
     try:
         user_chats = db_services.load_chats(user_id)
-
+        print('user chats - ',user_chats)
         return user_chats
 
     except Exception as error:
@@ -66,7 +66,7 @@ def load_messages_get(
             user_id,
             chat_id
         )
-
+        print('load messages: user_chat - ',user_chat)
         if not user_chat:
             raise HTTPException(
                 status_code=404,
@@ -91,7 +91,7 @@ def load_messages_get(
 
 
 async def send_message(
-    data: SendMessageRequest,
+    data:SendMessageRequest,
     chat_id: int,
     user_id: int
 ):
@@ -99,7 +99,8 @@ async def send_message(
 
     try:
         prompt = data.message
-        document_search = data.documentSearch
+        print('prompt - ',prompt)
+        document_search = data.document_search
 
         if not prompt or not prompt.strip():
             raise HTTPException(
@@ -120,14 +121,14 @@ async def send_message(
             )
 
         # Save user's message
-        await db_services.save_message(
+        db_services.save_message(
             chat_id,
             "user",
             prompt
         )
 
         # Load previous messages
-        messages = await db_services.load_messages(
+        messages = db_services.load_messages(
             chat_id
         )
 
@@ -158,7 +159,9 @@ async def send_message(
             }) + "\n"
 
             # Generate LLM response stream
-            stream = await generate_response_stream(
+
+            print("content in controller - ",context["contents"])
+            stream = generate_response_stream(
                 context["contents"]
             )
 
@@ -174,14 +177,14 @@ async def send_message(
                 }) + "\n"
 
             # Save assistant response
-            saved_message = await db_services.save_message(
+            saved_message = db_services.save_message(
                 chat_id,
                 "assistant",
                 full_response
             )
 
             # Save citations
-            await db_services.save_citations(
+            db_services.save_citations(
                 context["documentSources"],
                 saved_message.id
             )
@@ -201,14 +204,14 @@ async def send_message(
         async def error_stream():
 
             if full_response:
-                await db_services.save_message(
+                db_services.save_message(
                     chat_id,
                     "assistant",
                     full_response +
                     "\n\n[Response interrupted]"
                 )
             else:
-                await db_services.save_message(
+                db_services.save_message(
                     chat_id,
                     "assistant",
                     "Failed to generate response"

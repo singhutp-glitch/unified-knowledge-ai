@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends
 
 from app.controllers import chats_controller
 from app.dependencies.auth import get_current_user
-from app.schemas.chats import CreateChatRequest
+from app.schemas.chats import (CreateChatRequest ,SendMessageRequest)
 
 
 router = APIRouter(
-    prefix="/chats",
     tags=["Chats"],
     dependencies=[Depends(get_current_user)]
 )
@@ -15,14 +14,14 @@ router = APIRouter(
 def load_chats(
     user_id: int = Depends(get_current_user)
 ):
-    return chat_controller.load_chats_get(user_id)
+    return chats_controller.load_chats_get(user_id)
 
 @router.post("/")
 def create_chat(
     data: CreateChatRequest,
     user_id: int = Depends(get_current_user)
 ):
-    return chat_controller.create_chat_post(
+    return chats_controller.create_chat_post(
         data,
         user_id
     )
@@ -33,18 +32,20 @@ def load_messages(
     chat_id: int,
     user_id: int = Depends(get_current_user)
 ):
-    return chat_controller.load_messages_get(
+    return chats_controller.load_messages_get(
         chat_id,
         user_id
     )
 
 
 @router.post("/{chat_id}/messages")
-def send_message(
+async def send_message(
+    data: SendMessageRequest,
     chat_id: int,
     user_id: int = Depends(get_current_user)
 ):
-    return chat_controller.send_message(
+    return await chats_controller.send_message(
+        data,
         chat_id,
         user_id
     )

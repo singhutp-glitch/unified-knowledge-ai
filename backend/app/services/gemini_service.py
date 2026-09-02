@@ -12,6 +12,8 @@ ai = genai.Client(
 
 def generate_response_stream(contents):
 
+    print('content - ',contents)
+
     stream = ai.models.generate_content_stream(
         model="gemini-3.1-flash-lite",
         contents=contents,

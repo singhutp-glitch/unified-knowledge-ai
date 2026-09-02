@@ -1,5 +1,5 @@
 from app.models import Citation
-
+from sqlalchemy.orm import selectinload
 from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
@@ -38,7 +38,7 @@ def load_chats(user_id:int):
     with SessionLocal() as db:
         return db.query(Chat).filter(
             Chat.user_id == user_id
-        )
+        ).all()
 
 
 
@@ -102,7 +102,7 @@ def save_message(chat_id: int,role:str,content:str):
     with SessionLocal() as db:
 
         message = Message(
-            id=chat_id,
+            chat_id=chat_id,
             role=role,
             content=content
         )
@@ -111,7 +111,7 @@ def save_message(chat_id: int,role:str,content:str):
         db.commit()
         db.refresh(message)
 
-        return chat
+        return message
 
 
 

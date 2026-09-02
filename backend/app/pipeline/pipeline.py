@@ -12,9 +12,9 @@ async def build_pipeline_context(context):
 
         for feature in features:
 
-            if feature.should_run(context):
-                await feature.execute(context)
-
+            if feature["should_run"](context):
+                await feature["execute"](context)
+        print("start build_context")
         await build_context(context)
 
     except Exception as error:
