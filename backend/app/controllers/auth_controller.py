@@ -1,3 +1,4 @@
+import traceback
 from fastapi import HTTPException
 
 from app.schemas.auth import LoginRequest
@@ -61,7 +62,7 @@ def login(data: LoginRequest):
         )
 
     access_token = create_access_token(
-        data={"sub": str(user.id)}
+        user.id
     )
 
     return {
@@ -69,3 +70,33 @@ def login(data: LoginRequest):
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+
+
+def send_user_info(user_id: int):
+    try:
+        user = db_services.get_user_by_id(user_id)
+
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found"
+            )
+
+        return {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        print(error)
+        traceback.print_exc()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Server error"
+        )

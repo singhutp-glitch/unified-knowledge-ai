@@ -1,4 +1,5 @@
 from typing import Annotated
+import traceback
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -19,7 +20,6 @@ def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)]
 ):
     try:
-
         payload = jwt.decode(
             token,
             settings.jwt_secret_key,
@@ -27,7 +27,6 @@ def get_current_user(
         )
 
         user_id = payload.get("sub")
-
         if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,9 +41,11 @@ def get_current_user(
                 detail="User not found"
             )
 
-        return user
+        return user_id
 
-    except (InvalidTokenError, ValueError):
+    except InvalidTokenError as error:
+        print("JWT ERROR:", repr(error))
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials"

@@ -28,7 +28,7 @@ async function handleSubmit(e) {
 
   const result = await loginUser(email,password);
   
-  localStorage.setItem('token',result.token);
+  localStorage.setItem('token',result.access_token);
   setUser(result.user);
   
 }catch(error){
