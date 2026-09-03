@@ -1,14 +1,14 @@
 import os
 from uuid import uuid4
-
+import traceback
 from fastapi import HTTPException, UploadFile
 
 from app.services import db_services
 from app.rag.services.storage_service import upload_document
-from app.rag.parser_factory import parse_document
+from app.rag.parsers.parser_factory import parse_document
 from app.rag.chunker.chunk_document import chunk_document
 from app.rag.embeddings.generate_embeddings import generate_embeddings
-from app.rag.services.save_document_and_chunk import save_document_and_chunk
+from app.rag.services.save_document_and_chunks import save_document_and_chunks
 
 
 async def post_upload_document(
@@ -37,9 +37,10 @@ async def post_upload_document(
 
         # Read uploaded file
         file_content = await document.read()
+        document.file_content = file_content
 
         # Upload/store the document
-        file_path = await upload_document(
+        file_path = upload_document(
             file_content,
             document.filename
         )
@@ -90,7 +91,7 @@ async def post_upload_document(
         )
 
         # Save document and chunks
-        saved_document = await save_document_and_chunk(
+        saved_document = await save_document_and_chunks(
             {
                 "originalname": document.filename,
                 "mimetype": document.content_type,
@@ -112,6 +113,7 @@ async def post_upload_document(
 
     except Exception as error:
         print("Error:", error)
+        traceback.print_exc()
 
         raise HTTPException(
             status_code=500,

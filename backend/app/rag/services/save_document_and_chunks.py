@@ -1,9 +1,9 @@
-from app.database import SessionLocal
-from app.services.chunk_service import save_chunks
+from app.services.database import SessionLocal
+from app.rag.services.chunk_service import save_chunks
 from app.models import Document
 
 
-def save_document_and_chunk(data, chunks):
+def save_document_and_chunks(data, chunks):
 
     with SessionLocal() as db:
         try:

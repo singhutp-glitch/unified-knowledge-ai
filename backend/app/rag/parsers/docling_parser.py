@@ -11,15 +11,14 @@ converter = DocumentConverter()
 
 async def parse_docling(file: UploadFile) -> DoclingDocument:
 
-    file_bytes = await file.read()
-
     source = DocumentStream(
         name=file.filename,
-        stream=BytesIO(file_bytes)
+        stream=BytesIO(file.file_content)
     )
 
     print(f"Parsing {file.filename}")
 
     result = converter.convert(source)
+    print(result.document.export_to_markdown()[:2000])
 
     return result.document

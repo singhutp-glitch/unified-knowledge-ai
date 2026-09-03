@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, UploadFile
 
 from app.dependencies.auth import get_current_user
-from app.rag.controllers import rag_controller
+from app.rag.controllers import ingestion as rag_controller
 
 
 router = APIRouter(tags=["RAG"])
