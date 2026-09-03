@@ -1,7 +1,7 @@
 from fastapi import UploadFile
 
 from app.rag.parsers.txt_parser import parse_txt
-from app.rag.parsers.docling_parser import parse_docling
+from app.rag.parsers.docling_parser.docling_parser import parse_docling
 
 PARSER_MAP = {
     "application/pdf": parse_docling,

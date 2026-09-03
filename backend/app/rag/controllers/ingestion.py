@@ -85,13 +85,15 @@ async def post_upload_document(
             for index, chunk in enumerate(chunks[:30])
         )
 
+        print("chunks - ",chunk_text[0:2000])
+
         # Generate embeddings
         final_chunks = await generate_embeddings(
             chunks
         )
 
         # Save document and chunks
-        saved_document = await save_document_and_chunks(
+        saved_document = save_document_and_chunks(
             {
                 "originalname": document.filename,
                 "mimetype": document.content_type,
