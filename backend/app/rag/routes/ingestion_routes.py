@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, File, UploadFile
 
 from app.dependencies.auth import get_current_user
-from app.rag.controllers import ingestion as rag_controller
-
+from app.rag.controllers import ingestion 
+from app.rag.controllers import retrieval 
+from app.schemas.rag import RetrievalRequest
 
 router = APIRouter(tags=["RAG"])
 
@@ -13,7 +14,7 @@ async def upload_document(
     document: UploadFile = File(...),
     user_id: int = Depends(get_current_user)
 ):
-    return await rag_controller.post_upload_document(
+    return await ingestion.post_upload_document(
         document,
         chat_id,
         user_id
@@ -22,10 +23,12 @@ async def upload_document(
 
 @router.post("/chats/{chat_id}/chunks")
 async def get_chunks(
+    data:RetrievalRequest,
     chat_id: int,
     user_id: int = Depends(get_current_user)
 ):
-    return await rag_controller.get_chunks(
+    return await retrieval.get_chunks(
+        data,
         chat_id,
         user_id
     )
