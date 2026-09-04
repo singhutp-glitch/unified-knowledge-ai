@@ -4,6 +4,8 @@ from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message
+from app.models import Chunk
+
 
 def get_user_by_email(email: str):
     with SessionLocal() as db:
@@ -125,7 +127,7 @@ def save_citations(chunk_results, message_id: int):
                     citation_number=int(chunk["citationNumber"]),
                     chunk_id=chunk["id"]
                 )
-                for chunk in chunk_results.values()
+                for chunk in chunk_results
             ]
 
             with SessionLocal() as db:
@@ -134,3 +136,35 @@ def save_citations(chunk_results, message_id: int):
 
     except Exception as error:
         print(error)
+
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
+
+def load_chunk(chunk_id: int):
+
+    with SessionLocal() as db:
+
+        chunk = (
+            db.query(Chunk)
+            .options(
+                joinedload(Chunk.document)
+            )
+            .filter(
+                Chunk.id == chunk_id
+            )
+            .first()
+        )
+
+        if chunk is None:
+            return None
+
+        return {
+            "id": chunk.id,
+            "documentId": chunk.document_id,
+            "chunkIndex": chunk.chunk_index,
+            "text": chunk.text,
+            "pages": chunk.pages,
+            "type": chunk.type,
+            "sectionHeading": chunk.section_heading,
+            "originalFileName": chunk.document.original_file_name,
+        }

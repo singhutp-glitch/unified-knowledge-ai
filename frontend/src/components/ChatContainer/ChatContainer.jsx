@@ -13,19 +13,17 @@ const ChatContainer = ({messages,setSourceBar,setSourceBarSources
 }) => {
   
  async function openCitation(ids,citations){
-  
     const idSet = new Set(ids);
     const sideSources =[];
     const selectedSources = citations.filter(source =>
       idSet.has(source.citationNumber)
     );
-    console.log("citations - ",citations);
-
     for(const source of selectedSources){
        const cache = documentSourceCache[source.chunkId];
       if(cache){
         sideSources.push(cache);
       }else{
+        
       const chunk = await getChunk(source.chunkId);
       chunk.citationNumber = source.citationNumber;
 

@@ -158,6 +158,8 @@ export async function getMessages(chatId){
 
 export async function getChunk(chunkId){
     const token = localStorage.getItem('token');
+
+    console.log("get chunks called");
     const response = await fetch(
         `${API_BASE_URL}/documents/chunks/${chunkId}`,
         {
