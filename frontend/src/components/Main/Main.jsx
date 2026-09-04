@@ -179,7 +179,7 @@ const Main = ({currentChatId,setCurrentChatId,loadChats,messages,setMessages
                     citationNumber: Number(chunk.citationNumber),
                     chunkId: chunk.id
                 }));
-
+                console.log('newCitations - ',newCitations);
                 setMessages(prev => {
                     const updated = [...prev];
 

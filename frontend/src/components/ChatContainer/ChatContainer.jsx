@@ -19,6 +19,7 @@ const ChatContainer = ({messages,setSourceBar,setSourceBarSources
     const selectedSources = citations.filter(source =>
       idSet.has(source.citationNumber)
     );
+    console.log("citations - ",citations);
 
     for(const source of selectedSources){
        const cache = documentSourceCache[source.chunkId];

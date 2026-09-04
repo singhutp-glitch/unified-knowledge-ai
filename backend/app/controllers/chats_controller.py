@@ -98,57 +98,58 @@ async def send_message(
     full_response = ""
 
     try:
-        prompt = data.message
-        print('prompt - ',prompt)
-        document_search = data.document_search
-
-        if not prompt or not prompt.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Prompt is required"
-            )
-
-        # Verify that this chat belongs to the authenticated user
-        user_chat = db_services.search_chat_id_with_user_id(
-            user_id,
-            chat_id
-        )
-
-        if not user_chat:
-            raise HTTPException(
-                status_code=404,
-                detail="Chat not found"
-            )
-
-        # Save user's message
-        db_services.save_message(
-            chat_id,
-            "user",
-            prompt
-        )
-
-        # Load previous messages
-        messages = db_services.load_messages(
-            chat_id
-        )
-
-        # Build RAG pipeline context
-        context = {
-            "userMessages": messages,
-            "userPrompt": prompt,
-            "chatId": chat_id,
-            "options": {
-                "documentSearch": document_search
-            },
-            "documentSources": None,
-            "metaData": {},
-            "features": [],
-            "contents": []
-        }
-
-        await build_pipeline_context(context)
-
         async def generate():
+            prompt = data.message
+            print('prompt - ',prompt)
+            document_search = data.document_search
+
+            if not prompt or not prompt.strip():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Prompt is required"
+                )
+
+            # Verify that this chat belongs to the authenticated user
+            user_chat = db_services.search_chat_id_with_user_id(
+                user_id,
+                chat_id
+            )
+
+            if not user_chat:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Chat not found"
+                )
+
+            # Save user's message
+            db_services.save_message(
+                chat_id,
+                "user",
+                prompt
+            )
+
+            # Load previous messages
+            messages = db_services.load_messages(
+                chat_id
+            )
+
+            # Build RAG pipeline context
+            context = {
+                "userMessages": messages,
+                "userPrompt": prompt,
+                "chatId": chat_id,
+                "options": {
+                    "documentSearch": document_search
+                },
+                "documentSources": None,
+                "metaData": {},
+                "features": [],
+                "contents": [],
+            }
+
+            async for event in build_pipeline_context(context):
+                yield event
+
 
             nonlocal full_response
 

@@ -1,8 +1,8 @@
 import json
 
 from app.prompts.document_search_prompt import DOCUMENT_SEARCH_PROMPT
-# from app.rag.embeddings.query_embedding import generate_query_embeddings
-# from app.rag.services.retrieval_service import retrieve_chunks
+from app.rag.embeddings.query_embedding import generate_query_embeddings
+from app.rag.services.retrieval_service import retrieve_chunks
 
 
 document_search_feature = {
@@ -21,25 +21,23 @@ async def execute(context):
         "status": "Searching..."
     }
 
-    # context["stream"].write(
-    #     json.dumps(status_data) + "\n"
-    # )
+    yield json.dumps(status_data) + "\n"
+    
 
     feature = {}
 
     print("messages - ", context["userMessages"])
 
-    # # Generate embedding for the user's query
-    # query_embedding = await generate_query_embeddings(
-    #     context["userPrompt"]
-    # )
+    # Generate embedding for the user's query
+    query_embedding = await generate_query_embeddings(
+        context["userPrompt"]
+    )
 
-    # # Retrieve relevant chunks
-    # chunk_results = await retrieve_chunks(
-    #     query_embedding,
-    #     context["chatId"]
-    # )
-    chunk_results = []
+    # Retrieve relevant chunks
+    chunk_results = retrieve_chunks(
+        query_embedding,
+        context["chatId"]
+    )
 
     # Build text representation of retrieved chunks
     result_text = "\n".join(
@@ -55,7 +53,7 @@ content: {chunk["text"]}
     context["documentSources"] = [
         {
             **chunk,
-            "citationNumber": index + 1
+            "citationNumber": index + 1,
         }
         for index, chunk in enumerate(chunk_results)
     ]
@@ -73,10 +71,8 @@ content: {chunk["text"]}
         "type": "documentSources",
         "sources": context["documentSources"]
     }
-
-    # context["stream"].write(
-    #     json.dumps(source_data) + "\n"
-    # )
+    yield json.dumps(source_data) + "\n"
+    
 
 
 document_search_feature["should_run"] = should_run

@@ -13,7 +13,7 @@ def retrieve_chunks(
 
         stmt = (
             select(
-                Chunk.id.label("chunkId"),
+                Chunk.id.label("id"),
                 Chunk.document_id.label("documentId"),
                 Chunk.text,
                 Chunk.chunk_index.label("chunkIndex"),
