@@ -1,5 +1,5 @@
 from app.rag.embeddings.query_embedding import generate_query_embeddings
-from app.rag.services.retrieval_service import retrieve_chunks
+from app.rag.services.retrieval_service import retrieve_dense_chunks
 
 
 async def retrieve_dense(
@@ -11,7 +11,7 @@ async def retrieve_dense(
         query
     )
 
-    chunk_results = retrieve_chunks(
+    chunk_results = retrieve_dense_chunks(
         query_embedding,
         chat_id
     )

@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.dependencies.auth import get_current_user
 from app.services import db_services
 from app.rag.retrieval.dense.dense_retrieval import retrieve_dense
+from app.rag.retrieval.fulltext.fulltext_retrieval import retrieve_fulltext
+from app.rag.retrieval.hybrid.hybrid_retrieval import retrieve_hybrid
 from app.schemas.rag import RetrievalRequest
 
 async def get_chunks(
@@ -31,7 +33,7 @@ async def get_chunks(
                 detail="Query is required"
             )
 
-        chunk_results = await retrieve_dense(
+        chunk_results = await retrieve_hybrid(
             query,
             chat_id
         )

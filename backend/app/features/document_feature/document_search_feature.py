@@ -2,7 +2,7 @@ import json
 
 from app.prompts.document_search_prompt import DOCUMENT_SEARCH_PROMPT
 from app.rag.embeddings.query_embedding import generate_query_embeddings
-from app.rag.services.retrieval_service import retrieve_chunks
+from app.rag.services.retrieval_service import retrieve_dense_chunks
 
 
 document_search_feature = {

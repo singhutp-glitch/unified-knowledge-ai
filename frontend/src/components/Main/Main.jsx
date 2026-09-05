@@ -266,7 +266,7 @@ const Main = ({currentChatId,setCurrentChatId,loadChats,messages,setMessages
         const textResponse = response.chunkResults.map((chunkResult,index)=>{
             return `
 Result - ${index+1}
-chunk id - ${chunkResult.chunkId}
+chunk id - ${chunkResult.id}
 File - ${chunkResult.originalFileName}
 type - ${chunkResult.type}
 score - ${chunkResult.score}
@@ -454,7 +454,7 @@ function scrollMessagesToBottom(behavior = "smooth") {
     ? "Search your knowledge..."
     : "Ask your documents..."
 } value={prompt}/>
-                    <button onClick={handleSend} disabled={false} 
+                    <button onClick={handleSend} disabled={documentSearch} 
                     className='send-button'>
                         <img  src={assets.send_icon} alt="" />
                     </button>

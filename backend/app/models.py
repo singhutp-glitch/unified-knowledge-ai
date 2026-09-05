@@ -1,3 +1,4 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from datetime import datetime
 
 from sqlalchemy import (
@@ -259,6 +260,10 @@ class Chunk(Base):
     embedding: Mapped[list[float] | None] = mapped_column(
         Vector(),
         nullable=True,
+    )
+
+    search_vector = mapped_column(
+        TSVECTOR
     )
 
     created_at: Mapped[datetime] = mapped_column(
