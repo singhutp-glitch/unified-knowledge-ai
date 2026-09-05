@@ -50,7 +50,8 @@ async def retrieve_hybrid(
             "text": chunk["text"],
             "sectionHeading": chunk["sectionHeading"],
             "originalFileName": chunk["originalFileName"],
-            "type": chunk["type"]
-        })
+            "type": chunk["type"],
+            "pages":chunk["pages"]        
+            })
 
     return enriched_results

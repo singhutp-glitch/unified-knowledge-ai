@@ -454,7 +454,7 @@ function scrollMessagesToBottom(behavior = "smooth") {
     ? "Search your knowledge..."
     : "Ask your documents..."
 } value={prompt}/>
-                    <button onClick={handleSend} disabled={documentSearch} 
+                    <button onClick={handleSend} disabled={isSendDisabled} 
                     className='send-button'>
                         <img  src={assets.send_icon} alt="" />
                     </button>

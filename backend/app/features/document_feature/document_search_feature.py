@@ -2,7 +2,9 @@ import json
 
 from app.prompts.document_search_prompt import DOCUMENT_SEARCH_PROMPT
 from app.rag.embeddings.query_embedding import generate_query_embeddings
-from app.rag.services.retrieval_service import retrieve_dense_chunks
+from app.rag.retrieval.dense.dense_retrieval import retrieve_dense
+from app.rag.retrieval.fulltext.fulltext_retrieval import retrieve_fulltext
+from app.rag.retrieval.hybrid.hybrid_retrieval import retrieve_hybrid
 
 
 document_search_feature = {
@@ -29,13 +31,11 @@ async def execute(context):
     print("messages - ", context["userMessages"])
 
     # Generate embedding for the user's query
-    query_embedding = await generate_query_embeddings(
-        context["userPrompt"]
-    )
+    query = context["userPrompt"]
 
     # Retrieve relevant chunks
-    chunk_results = retrieve_chunks(
-        query_embedding,
+    chunk_results = await retrieve_hybrid(
+        query,
         context["chatId"]
     )
 
