@@ -2,6 +2,7 @@ import react,{ useState ,useEffect} from "react"
 import './ChatPage.css'
 import SideBar from "../SideBar/SideBar"
 import Main from "../Main/Main"
+import AdminPage from '../AdminPage/AdminPage.jsx'
 import NavBar from "../NavBar/NavBar";
 import SourceBar from "../SourceBar/SourceBar.jsx";
 import DocumentViewer from "../DocumentViewer/DcoumentViewer.jsx"
@@ -19,6 +20,7 @@ const ChatPage = ({user,onLogout}) => {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [documentViewerWidth, setDocumentViewerWidth] = useState(25 * 16);
+  const [currentPage,setCurrentPage] = useState('chatPage');
 
 
 
@@ -116,11 +118,12 @@ function stopDocumentResize(){
   return (
     <>
      <SideBar user={user} onLogout={onLogout} chats = {chats} setMessages={setMessages}
-     currentChatId = {currentChatId} setCurrentChatId = {setCurrentChatId}/>
+     currentChatId = {currentChatId} setCurrentChatId = {setCurrentChatId}
+     setCurrentPage={setCurrentPage}/>
      <div className="workspace">
   <NavBar />
-
   <div className="workspace-content">
+  {currentPage === 'chatPage'?
     <div className="main-content">
       <Main
         currentChatId={currentChatId}
@@ -133,22 +136,23 @@ function stopDocumentResize(){
         setSourceBarSources={setSourceBarSources}
         documentSourceCache={documentSourceCache}
         setDocumentSourceCache={setDocumentSourceCache}
-      />
+        />
     </div>
+:<AdminPage/>}
 
    {sourceBar && (<SourceBar startResize={startResize} sourceBarWidth={sourceBarWidth}
     sourceBarSources={sourceBarSources} setSourceBar={setSourceBar} 
     setViewerOpen={setViewerOpen} setSelectedDocument={setSelectedDocument}/>)}
   
     {viewerOpen && (
-    <DocumentViewer
+        <DocumentViewer
         document={selectedDocument}
         onClose={() => setViewerOpen(false)}
         setViewerOpen={setViewerOpen}
         startDocumentResize={startDocumentResize}
         documentViewerWidth={documentViewerWidth}
-    />
-)}
+        />
+    )}
   </div>
 </div>
            </>

@@ -8,6 +8,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    Column
 )
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -329,3 +330,33 @@ class Citation(Base):
             name="uq_citations_message_citation_number",
         ),
     )
+
+class Source(Base):
+    __tablename__ = "sources"
+
+    id = Column(Integer, primary_key=True)
+    type = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    account_email = Column(String, nullable=True)
+
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+
+
+class SourceCredential(Base):
+    __tablename__ = "source_credentials"
+
+    id = Column(Integer, primary_key=True)
+
+    source_id = Column(
+        Integer,
+        ForeignKey("sources.id"),
+        nullable=False,
+        unique=True
+    )
+
+    access_token = Column(Text, nullable=False)
+    refresh_token = Column(Text, nullable=True)
+    token_expiry = Column(DateTime, nullable=True)

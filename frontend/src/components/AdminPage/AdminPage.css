@@ -1,0 +1,21 @@
+div.admin-page{
+    width: 100%;
+}
+
+div.sources-bar{
+    display: flex;
+    width: 100%;
+    border: 1px black solid;
+}
+
+div.source-tab{
+    border-right: 2px black solid;
+    padding: 0.5rem
+}
+
+div.source-item{
+    display: flex;
+    justify-content:flex-start;
+    gap:3rem
+
+}

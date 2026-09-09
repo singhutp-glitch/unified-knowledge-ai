@@ -3,7 +3,9 @@ import './SideBar.css'
 import {assets} from '../../assets/assets.js'
 import { getMessages } from '../../services/api.js';
 import UserProfile from '../UserProfile/UserProfile.jsx';
-const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages}) => {
+const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages
+  ,setCurrentPage
+}) => {
   const [extended,setExtended] = useState(false);
   const handleNewChat = ()=>{
     setCurrentChatId(null);
@@ -13,6 +15,9 @@ const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages
     setCurrentChatId(chatId);
     const messages = await getMessages(chatId);
     setMessages(messages);
+  }
+  const handleKowledgeClick = ()=>{
+    setCurrentPage('adminPage')
   }
 
 
@@ -24,7 +29,11 @@ const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages
         <img src={assets.plus_icon} alt="" />
         {extended?<p>New Chat</p>:null}
       </div>
+        
       {extended?
+        <><div  onClick={handleKowledgeClick} className='company-knowledge'>
+          <p>Company Knowledge</p>
+        </div>
       <div className="recent">
         <p className='recent-title'>Recent</p>
         {chats.map((chat) => (
@@ -35,7 +44,7 @@ const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages
         </div>
         ))}
         
-      </div>
+      </div></>
         :null}
       </div>
       <div className='bottom'>

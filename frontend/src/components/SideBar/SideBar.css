@@ -29,7 +29,20 @@
 
 .side-bar .new-chat{
     margin-top:50px;
-    display: inline-flex;
+    display: flex;
+    align-items: center;
+    gap:10px;
+    padding:10px 15px;
+    background-color: hsl(0, 0%, 90%);
+    border-radius: 50px;
+    font-size: 14px;
+    color: gray;
+    cursor: pointer;
+}
+
+.side-bar .company-knowledge{
+    margin-top:50px;
+    display: flex;
     align-items: center;
     gap:10px;
     padding:10px 15px;
