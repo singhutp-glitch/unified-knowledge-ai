@@ -4,7 +4,8 @@ from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message
-from app.models import Chunk
+from app.models import Chunk, Source, SourceCredential
+from datetime import datetime
 
 
 def get_user_by_email(email: str):
@@ -168,3 +169,88 @@ def load_chunk(chunk_id: int):
             "sectionHeading": chunk.section_heading,
             "originalFileName": chunk.document.original_file_name,
         }
+
+#source service
+def get_source_by_type(source_type: str):
+    with SessionLocal() as db:
+        return db.query(Source).filter(
+            Source.type == source_type
+        ).first()
+
+
+def update_source(source_id: int, status: str, account_email: str):
+    with SessionLocal() as db:
+        source = db.query(Source).filter(
+            Source.id == source_id
+        ).first()
+
+        if not source:
+            return None
+
+        source.status = status
+        source.account_email = account_email
+
+        db.commit()
+        db.refresh(source)
+
+        return source
+
+
+def create_source(source_type:str,name:str,status:str,account_email:str):
+     with SessionLocal() as db:
+
+        source = Source(
+            type=source_type,
+            name=name,
+            account_email=account_email,
+            status=status
+        )
+
+        db.add(source)
+        db.commit()
+        db.refresh(source)
+
+        return source
+
+
+def get_credentials_by_source_id(source_id: int):
+    with SessionLocal() as db:
+        return db.query(SourceCredential).filter(
+            SourceCredential.source_id == source_id
+        ).first()
+
+
+def update_credentials(source_id: int, access_token: str, refresh_token: str,token_expiry:datetime):
+    with SessionLocal() as db:
+        source_credentials = db.query(SourceCredential).filter(
+            SourceCredential.source_id == source_id
+        ).first()
+
+        if not source_credentials:
+            return None
+
+        source_credentials.access_token = access_token
+        source_credentials.refresh_token = refresh_token
+        source_credentials.token_expiry = token_expiry
+
+        db.commit()
+        db.refresh(source_credentials)
+
+        return source_credentials
+
+
+def create_source_credentials(source_id: int, access_token: str, refresh_token: str,token_expiry:datetime):
+     with SessionLocal() as db:
+
+        source_credentials = SourceCredential(
+            source_id=source_id,
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_expiry=token_expiry
+        )
+
+        db.add(source_credentials)
+        db.commit()
+        db.refresh(source_credentials)
+
+        return source_credentials
