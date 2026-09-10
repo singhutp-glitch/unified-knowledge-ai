@@ -32,6 +32,8 @@ class User(Base):
         String(100),
         nullable=False,
     )
+    
+
 
     email: Mapped[str] = mapped_column(
         String(255),

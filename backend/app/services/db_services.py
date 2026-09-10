@@ -213,14 +213,14 @@ def create_source(source_type:str,name:str,status:str,account_email:str):
         return source
 
 
-def get_credentials_by_source_id(source_id: int):
+def get_source_credentials_by_source_id(source_id: int):
     with SessionLocal() as db:
         return db.query(SourceCredential).filter(
             SourceCredential.source_id == source_id
         ).first()
 
 
-def update_credentials(source_id: int, access_token: str, refresh_token: str,token_expiry:datetime):
+def update_source_credentials(source_id: int, access_token: str, refresh_token: str,token_expiry:datetime):
     with SessionLocal() as db:
         source_credentials = db.query(SourceCredential).filter(
             SourceCredential.source_id == source_id
@@ -254,3 +254,36 @@ def create_source_credentials(source_id: int, access_token: str, refresh_token: 
         db.refresh(source_credentials)
 
         return source_credentials
+
+
+def get_sources():
+    with SessionLocal() as db:
+        return db.query(Source).all()
+
+
+def delete_source_credentials(source_id: int):
+    with SessionLocal() as db:
+        source_credentials = db.query(SourceCredential).filter(
+            SourceCredential.source_id == source_id
+        ).first()
+
+        if not source_credentials:
+            return
+
+        db.delete(source_credentials)
+        db.commit()
+
+
+def delete_source(source_id: int):
+    with SessionLocal() as db:
+        source = db.query(Source).filter(
+            Source.id == source_id
+        ).first()
+
+        if not source:
+            return None
+
+        db.delete(source)
+        db.commit()
+
+        return source

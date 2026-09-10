@@ -8,7 +8,7 @@ import SourceBar from "../SourceBar/SourceBar.jsx";
 import DocumentViewer from "../DocumentViewer/DcoumentViewer.jsx"
 import { getChats } from "../../services/api.js";
 
-const ChatPage = ({user,onLogout}) => {
+const ChatPage = ({user,onLogout,knowledgeSources,setKnowledgeSources}) => {
    const [chats,setChats] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [messages,setMessages] = useState([])
@@ -138,7 +138,7 @@ function stopDocumentResize(){
         setDocumentSourceCache={setDocumentSourceCache}
         />
     </div>
-:<AdminPage/>}
+: <AdminPage knowledgeSources={knowledgeSources} setKnowledgeSources={setKnowledgeSources}/>}
 
    {sourceBar && (<SourceBar startResize={startResize} sourceBarWidth={sourceBarWidth}
     sourceBarSources={sourceBarSources} setSourceBar={setSourceBar} 

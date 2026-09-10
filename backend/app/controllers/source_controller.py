@@ -1,21 +1,26 @@
-
+from app.sources.google_drive.oauth import revoke_google_credentials
 from googleapiclient.discovery import build
 
 from app.sources.google_drive.oauth import exchange_code_for_credentials
-from app.services import db_service
+from app.services import db_services
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
 
 from app.sources.google_drive.oauth import create_authorization_url
-from app.source.google_drive.oauth_state import oauth_states
+from app.sources.google_drive.oauth_state import oauth_states
 
 def connect_google_drive(user_id: int):
 
-    authorization_url, state = create_authorization_url()
+    authorization_url, state, code_verifier = create_authorization_url()
 
-    oauth_states[state] = user_id
+    oauth_states[state] = {
+        "user_id": user_id,
+        "code_verifier": code_verifier
+    }
 
-    return RedirectResponse(authorization_url)
+    return {
+        "authorization_url": authorization_url
+    }
 
 
 
@@ -25,20 +30,23 @@ def google_drive_callback(code: str, state: str):
     # 1. Verify OAuth state
     # --------------------------------------------------
 
-    user_id = oauth_states.pop(state, None)
+    oauth_data = oauth_states.pop(state, None)
 
-    if user_id is None:
+    if oauth_data is None:
         raise HTTPException(
             status_code=400,
             detail="Invalid or expired OAuth state"
         )
+
+    user_id = oauth_data["user_id"]
+    code_verifier = oauth_data["code_verifier"]
 
     # --------------------------------------------------
     # 2. Exchange authorization code for credentials
     # --------------------------------------------------
 
     try:
-        credentials = exchange_code_for_credentials(code, state)
+        credentials = exchange_code_for_credentials(code, state,code_verifier)
 
     except Exception as error:
         print(f"Google OAuth token exchange failed: {error}")
@@ -77,7 +85,7 @@ def google_drive_callback(code: str, state: str):
     # 4. Check whether Google Drive is already connected
     # --------------------------------------------------
 
-    existing_source = db_service.get_source_by_type(
+    existing_source = db_services.get_source_by_type(
         "google_drive"
     )
 
@@ -89,7 +97,7 @@ def google_drive_callback(code: str, state: str):
 
         if existing_source:
 
-            source = db_service.update_source(
+            source = db_services.update_source(
                 source_id=existing_source.id,
                 status="connected",
                 account_email=account_email
@@ -97,8 +105,8 @@ def google_drive_callback(code: str, state: str):
 
         else:
 
-            source = db_service.create_source(
-                type="google_drive",
+            source = db_services.create_source(
+                source_type="google_drive",
                 name="Google Drive",
                 status="connected",
                 account_email=account_email
@@ -109,14 +117,14 @@ def google_drive_callback(code: str, state: str):
         # --------------------------------------------------
 
         existing_credentials = (
-            db_service.get_credentials_by_source_id(
+            db_services.get_source_credentials_by_source_id(
                 source.id
             )
         )
 
         if existing_credentials:
 
-            db_service.update_credentials(
+            db_services.update_source_credentials(
                 source_id=source.id,
                 access_token=credentials.token,
                 refresh_token=(
@@ -128,7 +136,7 @@ def google_drive_callback(code: str, state: str):
 
         else:
 
-            db_service.create_credentials(
+            db_services.create_source_credentials(
                 source_id=source.id,
                 access_token=credentials.token,
                 refresh_token=credentials.refresh_token,
@@ -149,7 +157,59 @@ def google_drive_callback(code: str, state: str):
 
     return RedirectResponse(
         url=(
-            f"http://localhost:5173/"
-            f"company-knowledge/sources/{source.id}/enrollment"
-        )
+            f"http://localhost:5173/")
     )
+
+
+def get_sources():
+    sources = db_services.get_sources()
+    return {
+    "sources": [
+        {
+            "id": source.id,
+            "type": source.type,
+            "name": source.name,
+            "status": source.status,
+            "account_email": source.account_email,
+        }
+        for source in sources
+    ]
+    }
+
+
+def disconnect_google_drive():
+
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    credentials = db_services.get_source_credentials_by_source_id(
+        source.id
+    )
+
+    if credentials:
+        try:
+            revoke_google_credentials(
+                credentials.refresh_token
+                or credentials.access_token
+            )
+
+        except Exception as error:
+            print(f"Google token revocation failed: {error}")
+
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to revoke Google Drive authorization"
+            )
+
+        db_services.delete_source_credentials(source.id)
+
+    db_services.delete_source(source.id)
+
+    return {
+        "message": "Google Drive disconnected successfully"
+    }
