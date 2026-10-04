@@ -4,6 +4,9 @@ import "./SourcePage.css"
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
 
+  const handleSelectFolder = ()=>{
+    
+  }
 
   return (
     <div className='admin-source-page'>
@@ -29,7 +32,8 @@ const SourcePage = ({sourceInfo}) => {
                     No Folder Selected
                 </div>
                 <div className="folder-selection-buttons">
-                    <button  className="folder-select">
+                    <button  className="folder-select"
+                    onClick={handleSelectFolder}>
                         Select a folder
                     </button>
                 </div></>
