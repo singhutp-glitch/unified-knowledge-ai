@@ -30,3 +30,9 @@ def disconnect_google_drive(
     user_id: int = Depends(get_current_user)
 ):
     return source_controller.disconnect_google_drive()
+
+@router.get("/google-drive/picker-token")
+def get_sources(
+    user_id: int = Depends(get_current_user)
+):
+    return source_controller.get_google_drive_picker_token()

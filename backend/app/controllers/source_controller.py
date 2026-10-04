@@ -9,6 +9,8 @@ from fastapi.responses import RedirectResponse
 from app.sources.google_drive.oauth import create_authorization_url
 from app.sources.google_drive.oauth_state import oauth_states
 
+from app.services import google_drive_service
+
 def connect_google_drive(user_id: int):
 
     authorization_url, state, code_verifier = create_authorization_url()
@@ -212,4 +214,30 @@ def disconnect_google_drive():
 
     return {
         "message": "Google Drive disconnected successfully"
+    }
+
+
+def get_google_drive_picker_token():
+    source = db_service.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    credentials = db_service.get_credentials_by_source_id(source.id)
+
+    if not credentials:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive credentials not found"
+        )
+
+    access_token = google_drive_service.get_valid_access_token(
+        credentials
+    )
+
+    return {
+        "access_token": access_token
     }

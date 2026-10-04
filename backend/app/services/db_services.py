@@ -287,3 +287,24 @@ def delete_source(source_id: int):
         db.commit()
 
         return source
+
+def update_access_token(
+    source_id: int,
+    access_token: str,
+    token_expiry: datetime
+):
+    with SessionLocal() as db:
+        source_credentials = db.query(SourceCredential).filter(
+            SourceCredential.source_id == source_id
+        ).first()
+
+        if not source_credentials:
+            return None
+
+        source_credentials.access_token = access_token
+        source_credentials.token_expiry = token_expiry
+
+        db.commit()
+        db.refresh(source_credentials)
+
+        return source_credentials
