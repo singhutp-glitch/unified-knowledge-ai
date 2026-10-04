@@ -342,6 +342,9 @@ class Source(Base):
     status = Column(String, nullable=False)
     account_email = Column(String, nullable=True)
 
+    root_folder_id = Column(String, nullable=True)
+    root_folder_name = Column(String, nullable=True)
+
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 
