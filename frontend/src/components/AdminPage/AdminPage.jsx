@@ -17,8 +17,13 @@ const AdminPage = ({knowledgeSources,setKnowledgeSources}) => {
     <div className="admin-page">
         <div className="sources-bar">
             <div className="source-tab">
-                Sources
+                Sources:
             </div>
+            {
+                knowledgeSources.map((source)=>(<div className="source-tabs" key={source.id}>
+                {source.name}
+            </div>))
+            }
         </div>
         <div className="sources-page">
             Sources:

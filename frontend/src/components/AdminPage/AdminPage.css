@@ -10,12 +10,16 @@ div.sources-bar{
 
 div.source-tab{
     border-right: 2px black solid;
-    padding: 0.5rem
+    padding: 0.5rem;
+    font-weight: 700;
 }
-
+div.source-tabs{
+    border-right: 2px black solid;
+    padding: 0.5rem;
+}
 div.source-item{
     display: flex;
     justify-content:flex-start;
-    gap:3rem
+    gap:3rem;
 
 }
