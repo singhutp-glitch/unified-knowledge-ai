@@ -52,7 +52,6 @@ function App() {
       const result = await getSources();
 
       setKnowledgeSources(result.sources);
-      console.log("knowledge - ",result.sources);
     } catch (error) {
       console.error(error)
     }

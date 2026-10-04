@@ -1,0 +1,17 @@
+div.admin-source-bar{
+    display: flex;
+    width: 100%;
+    border: 1px black solid;
+}
+
+div.admin-source-bar-tabs{
+    border-right: 2px black solid;
+    padding: 0.5rem;
+}
+
+div.sync-folder-items{
+    display: flex;
+    justify-content:flex-start;
+    gap:3rem;
+
+}

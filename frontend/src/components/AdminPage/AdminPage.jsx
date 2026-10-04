@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './AdminPage.css'
 import { connectGoogleDrive, disconnectGoogleDrive } from '../../services/sourceApi.js'
+import SourcePage from '../SourcePage/SourcePage.jsx'
 
 const AdminPage = ({knowledgeSources,setKnowledgeSources}) => {
 
+  const [selectedKnowledgeSource,setSelectedKnowledgeSource] = useState(null);
   const handleDisconnectGoogleDrive = async ()=>{
     try{
         await disconnectGoogleDrive();
@@ -15,35 +17,43 @@ const AdminPage = ({knowledgeSources,setKnowledgeSources}) => {
 
   return (
     <div className="admin-page">
-        <div className="sources-bar">
-            <div className="source-tab">
+        <div className="admin-sources-bar">
+            <div className="admin-source-tab" onClick={()=>{
+                        setSelectedKnowledgeSource(null)}}>
                 Sources:
             </div>
             {
-                knowledgeSources.map((source)=>(<div className="source-tabs" key={source.id}>
+                knowledgeSources.map((source,index)=>(
+                <div className="admin-source-tabs" key={source.id}
+                    onClick={()=>{
+                        setSelectedKnowledgeSource(index)}}
+                    >
                 {source.name}
             </div>))
             }
         </div>
-        <div className="sources-page">
+        {
+            selectedKnowledgeSource!==null?
+            <SourcePage sourceInfo={knowledgeSources[selectedKnowledgeSource]}/>:
+            <div className="admin-sources-page">
             Sources:
-            <div className="source-item">
-                <div className="source-name">
+            <div className="admin-source-item">
+                <div className="admin-source-name">
                     Google drive
                 </div>
                 {knowledgeSources.length===0?
-                    <><div className="source-connection">
+                    <><div className="admin-source-connection">
                     Disconnected
                 </div>
-                <div className="source-buttons">
+                <div className="admin-source-buttons">
                     <button onClick={connectGoogleDrive} className="source-connect">
                         Connect
                     </button>
                 </div></>
-                : <><div className="source-connection">
+                : <><div className="admin-source-connection">
                         Connected
                     </div>
-                    <div className="source-buttons">
+                    <div className="admin-source-buttons">
                         <button onClick={handleDisconnectGoogleDrive} className="source-disconnect">
                             Disconnect
                         </button>
@@ -51,6 +61,8 @@ const AdminPage = ({knowledgeSources,setKnowledgeSources}) => {
                 }
             </div>
         </div>
+        }
+        
     </div>
   )
 }

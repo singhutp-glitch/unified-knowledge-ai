@@ -2,22 +2,24 @@ div.admin-page{
     width: 100%;
 }
 
-div.sources-bar{
+div.admin-sources-bar{
     display: flex;
     width: 100%;
     border: 1px black solid;
 }
 
-div.source-tab{
+div.admin-source-tab{
     border-right: 2px black solid;
     padding: 0.5rem;
     font-weight: 700;
+    cursor: pointer;
 }
-div.source-tabs{
+div.admin-source-tabs{
     border-right: 2px black solid;
     padding: 0.5rem;
+    cursor: pointer;
 }
-div.source-item{
+div.admin-source-item{
     display: flex;
     justify-content:flex-start;
     gap:3rem;
