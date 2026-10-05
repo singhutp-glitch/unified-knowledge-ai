@@ -4,6 +4,8 @@ from fastapi.responses import RedirectResponse
 from app.dependencies.auth import get_current_user
 from app.controllers import source_controller
 
+from app.schemas.source import (RootFolderRequest)
+
 
 router = APIRouter( tags=["sources"])
 
@@ -32,7 +34,17 @@ def disconnect_google_drive(
     return source_controller.disconnect_google_drive()
 
 @router.get("/google-drive/picker-token")
-def get_sources(
+def get_picker_token(
     user_id: int = Depends(get_current_user)
 ):
     return source_controller.get_google_drive_picker_token()
+
+@router.post("/google-drive/root-folder")
+def post_root_folder(
+    data: RootFolderRequest,
+    user_id: int = Depends(get_current_user)
+):
+    return source_controller.post_google_drive_root_folder(
+        data.folder_id,
+        user_id
+    )

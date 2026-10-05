@@ -1,10 +1,33 @@
 import React, { useState } from 'react'
 import "./SourcePage.css" 
+import { getPickerToken,putRootFolderId } from '../../services/sourceApi'
+import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
+
 
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
+  const [selectedFolder,setSelectedFolder] = useState(null);
 
-  const handleSelectFolder = ()=>{
+  async function handleFolderSelected(folder) {
+
+    console.log("Selected folder:", folder);
+
+    // folder.id
+    // folder.name
+    const data = await putRootFolderId(folder.id);
+
+    // Backend gives authoritative folder details
+    setSelectedFolder(data.folder);
+}
+  const handleSelectFolder = async ()=>{
+    try{
+      const data = await getPickerToken();
+
+      await openGoogleDrivePicker(data.access_token,handleFolderSelected);
+
+    }catch(error){
+      console.log(error);
+    }
     
   }
 
@@ -27,8 +50,18 @@ const SourcePage = ({sourceInfo}) => {
                 <div className="sync-folder-message">
                     Sync Folder:
                 </div>
-                {true?
-                    <><div className="selected-folder">
+                {selectedFolder?
+                   <><div className="selected-folder">
+                    {selectedFolder.name}
+                </div>
+                <div className="folder-selection-buttons">
+                    <button  className="folder-select"
+                    >
+                        Change root folder
+                    </button>
+                </div></>
+                    :
+                      <><div className="selected-folder">
                     No Folder Selected
                 </div>
                 <div className="folder-selection-buttons">
@@ -37,16 +70,6 @@ const SourcePage = ({sourceInfo}) => {
                         Select a folder
                     </button>
                 </div></>
-                : <>
-                {/* <div className="admin-source-connection">
-                        Connected
-                    </div>
-                    <div className="admin-source-buttons">
-                        <button onClick={handleDisconnectGoogleDrive} className="source-disconnect">
-                            Disconnect
-                        </button>
-                    </div> */}
-                    </>
                 }
             </div>
           </div>:

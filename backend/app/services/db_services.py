@@ -288,6 +288,23 @@ def delete_source(source_id: int):
 
         return source
 
+def update_source_root_folder(source_id: int, folder_id: str, folder_name: str):
+    with SessionLocal() as db:
+        source = db.query(Source).filter(
+            Source.id == source_id
+        ).first()
+
+        if not source:
+            return None
+
+        source.root_folder_id = folder_id
+        source.root_folder_name = folder_name
+
+        db.commit()
+        db.refresh(source)
+
+        return source
+
 def update_access_token(
     source_id: int,
     access_token: str,

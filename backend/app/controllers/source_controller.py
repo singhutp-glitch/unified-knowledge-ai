@@ -2,7 +2,7 @@ from app.sources.google_drive.oauth import revoke_google_credentials
 from googleapiclient.discovery import build
 
 from app.sources.google_drive.oauth import exchange_code_for_credentials
-from app.services import db_services
+from app.services import db_services, google_drive_service
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
 
@@ -218,7 +218,7 @@ def disconnect_google_drive():
 
 
 def get_google_drive_picker_token():
-    source = db_service.get_source_by_type("google_drive")
+    source = db_services.get_source_by_type("google_drive")
 
     if not source:
         raise HTTPException(
@@ -226,7 +226,7 @@ def get_google_drive_picker_token():
             detail="Google Drive is not connected"
         )
 
-    credentials = db_service.get_credentials_by_source_id(source.id)
+    credentials = db_services.get_source_credentials_by_source_id(source.id)
 
     if not credentials:
         raise HTTPException(
@@ -241,3 +241,54 @@ def get_google_drive_picker_token():
     return {
         "access_token": access_token
     }
+
+
+def post_google_drive_root_folder(folder_id, user_id):
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    credentials = db_services.get_source_credentials_by_source_id(
+        source.id
+    )
+
+    if not credentials:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive credentials not found"
+        )
+
+    folder = google_drive_service.get_folder(
+        credentials,
+        folder_id
+    )
+
+    if not folder:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive folder not found"
+        )
+
+    if folder["mimeType"] != "application/vnd.google-apps.folder":
+        raise HTTPException(
+            status_code=400,
+            detail="Selected item is not a folder"
+        )
+
+    updated_source = db_services.update_source_root_folder(
+        source.id,
+        folder["id"],
+        folder["name"]
+    )
+
+    return {
+        "message": "Google Drive root folder selected successfully",
+        "folder": {
+            "id": updated_source.root_folder_id,
+            "name": updated_source.root_folder_name
+        }
+    }  

@@ -56,3 +56,53 @@ export async function disconnectGoogleDrive() {
     }
     return true
 }
+
+export async function getPickerToken(){
+    const token = localStorage.getItem("token");
+        const response = await fetch(
+            `${API_BASE_URL}/sources/google-drive/picker-token`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to get Google Drive access token");
+        }
+
+        const data = await response.json();
+        return data
+}
+
+export async function putRootFolderId(folderId){
+    const token = localStorage.getItem("token")
+    const response = await fetch(
+        `${API_BASE_URL}/sources/google-drive/root-folder`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+                folder_id: folderId
+            })
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to save root folder"
+        );
+    }
+
+    const data = await response.json();
+    return data;
+    
+}
