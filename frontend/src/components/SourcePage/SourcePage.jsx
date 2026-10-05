@@ -31,6 +31,16 @@ const SourcePage = ({sourceInfo}) => {
     
   }
 
+  const handleRemoveFolder =async ()=>{
+     try{
+      await removeRootFolder();
+      setSelectedFolder(null);
+    }catch(error){
+      console.log(error);
+    }
+    
+  }
+
   return (
     <div className='admin-source-page'>
       <div className="admin-source-bar">
@@ -58,6 +68,11 @@ const SourcePage = ({sourceInfo}) => {
                     <button  className="folder-select"
                     >
                         Change root folder
+                    </button>
+                    <button  className="folder-remove"
+                    onClick={handleRemoveFolder}
+                    >
+                        Remove root Folder
                     </button>
                 </div></>
                     :

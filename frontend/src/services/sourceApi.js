@@ -106,3 +106,30 @@ export async function putRootFolderId(folderId){
     return data;
     
 }
+
+
+export async function removeRootFolder(){
+    const token = localStorage.getItem("token")
+    const response = await fetch(
+        `${API_BASE_URL}/sources/google-drive/root-folder`,
+        {
+            method: "DELETE",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    `Bearer ${token}`
+            },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to remove root folder"
+        );
+    }
+
+    const data = await response.json();
+    return data;
+    
+}

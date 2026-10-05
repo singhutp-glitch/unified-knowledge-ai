@@ -288,7 +288,7 @@ def delete_source(source_id: int):
 
         return source
 
-def update_source_root_folder(source_id: int, folder_id: str, folder_name: str):
+def update_source_root_folder(source_id: int, folder_id: str|None, folder_name: str|None):
     with SessionLocal() as db:
         source = db.query(Source).filter(
             Source.id == source_id

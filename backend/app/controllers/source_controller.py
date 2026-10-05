@@ -292,3 +292,28 @@ def post_google_drive_root_folder(folder_id, user_id):
             "name": updated_source.root_folder_name
         }
     }  
+
+def delete_google_drive_root_folder():
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    updated_source = db_services.update_source_root_folder(
+        source.id,
+        None,
+        None
+    )
+
+    if not updated_source:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to remove root folder"
+        )
+
+    return {
+        "message": "Google Drive root folder removed successfully"
+    }
