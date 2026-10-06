@@ -317,3 +317,13 @@ def delete_google_drive_root_folder():
     return {
         "message": "Google Drive root folder removed successfully"
     }
+
+
+
+def get_google_drive_root_folder():
+    source = db_services.get_source_by_type("google_drive")
+
+    return {
+            "id": source.root_folder_id,
+            "name": source.root_folder_name
+            }

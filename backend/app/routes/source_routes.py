@@ -54,3 +54,10 @@ def post_root_folder(
     user_id: int = Depends(get_current_user)
 ):
     return source_controller.delete_google_drive_root_folder()
+
+
+@router.get("/google-drive/root-folder")
+def get_root_folder(
+    user_id: int = Depends(get_current_user)
+):
+    return source_controller.get_google_drive_root_folder()

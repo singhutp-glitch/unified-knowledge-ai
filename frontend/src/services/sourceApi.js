@@ -133,3 +133,33 @@ export async function removeRootFolder(){
     return data;
     
 }
+
+
+
+export async function getRootFolder(){
+    const token = localStorage.getItem("token")
+    const response = await fetch(
+        `${API_BASE_URL}/sources/google-drive/root-folder`,
+        {
+            method: "GET",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    `Bearer ${token}`
+            },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to get root folder"
+        );
+    }
+
+    const data = await response.json();
+    return data;
+    
+}
+
+

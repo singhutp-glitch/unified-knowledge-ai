@@ -1,12 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import "./SourcePage.css" 
-import { getPickerToken,putRootFolderId } from '../../services/sourceApi'
+import { getPickerToken,putRootFolderId,removeRootFolder
+  ,getRootFolder
+ } from '../../services/sourceApi'
 import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
 
 
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
-  const [selectedFolder,setSelectedFolder] = useState(null);
+  const [rootFolder,setRootFolder] = useState(null);
+
+   useEffect(() => {
+        async function loadRootFolder() {
+            const data = await getRootFolder();
+            setRootFolder(data);
+        }
+
+        loadRootFolder();
+    }, []);
 
   async function handleFolderSelected(folder) {
 
@@ -17,7 +28,7 @@ const SourcePage = ({sourceInfo}) => {
     const data = await putRootFolderId(folder.id);
 
     // Backend gives authoritative folder details
-    setSelectedFolder(data.folder);
+    setRootFolder(data.folder);
 }
   const handleSelectFolder = async ()=>{
     try{
@@ -34,7 +45,7 @@ const SourcePage = ({sourceInfo}) => {
   const handleRemoveFolder =async ()=>{
      try{
       await removeRootFolder();
-      setSelectedFolder(null);
+      setRootFolder(null);
     }catch(error){
       console.log(error);
     }
@@ -60,9 +71,9 @@ const SourcePage = ({sourceInfo}) => {
                 <div className="sync-folder-message">
                     Sync Folder:
                 </div>
-                {selectedFolder?
+                {rootFolder?
                    <><div className="selected-folder">
-                    {selectedFolder.name}
+                    {rootFolder.name}
                 </div>
                 <div className="folder-selection-buttons">
                     <button  className="folder-select"
