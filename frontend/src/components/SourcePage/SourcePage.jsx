@@ -9,6 +9,7 @@ import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
   const [rootFolder,setRootFolder] = useState({});
+  const [syncChanges,setSyncChanges] = useState("notUpdated");
 
    useEffect(() => {
         async function loadRootFolder() {
@@ -19,6 +20,11 @@ const SourcePage = ({sourceInfo}) => {
 
         loadRootFolder();
     }, []);
+  
+  async function handleCheckoutClick(){
+    const changes = await getSyncChanges();
+    setSyncChanges(changes);
+  }
 
   async function handleFolderSelected(folder) {
 
@@ -59,8 +65,15 @@ const SourcePage = ({sourceInfo}) => {
         <div className="admin-source-bar-tabs">
           {sourceInfo.name}
         </div>
-        <div className="admin-source-bar-tabs">
+        <div className="admin-source-bar-tabs" onClick={()=>{
+          setSelectedTab("syncFolder")
+        }}>
           Sync Folder
+        </div>
+        <div className="admin-source-bar-tabs" onClick={()=>{
+          setSelectedTab("syncStatus")
+        }}>
+          Sync Status
         </div>
       </div>
       <div className="admin-source-page-main">
@@ -102,6 +115,20 @@ const SourcePage = ({sourceInfo}) => {
           </div>:
           <div className="sync-status-page">
             sync status page
+            <br />
+            <button className="checkout-button">
+              checkout
+            </button>
+            <div className="changes-text">
+              changes:
+            </div>
+            <div className="changes">
+              {
+                syncChanges==="notUpdated"?
+                "not checked yet":
+                syncChanges.map((change)=><div>change</div>)
+              }
+            </div>
           </div>
         }
       </div>

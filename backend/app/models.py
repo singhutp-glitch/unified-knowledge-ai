@@ -219,6 +219,31 @@ class Document(Base):
         cascade="all, delete-orphan",
     )
 
+class CompanyDocument(Base):
+    __tablename__ = "company_documents"
+
+    document_id = Column(
+        Integer,
+        ForeignKey("documents.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+
+    source_id = Column(
+        Integer,
+        ForeignKey("sources.id"),
+        nullable=False
+    )
+
+    external_file_id = Column(
+        String,
+        nullable=False,
+        unique=True
+    )
+
+    external_modified_at = Column(
+        DateTime,
+        nullable=False
+    )
 
 class Chunk(Base):
     __tablename__ = "chunks"
