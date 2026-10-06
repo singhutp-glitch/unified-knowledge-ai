@@ -325,3 +325,23 @@ def update_access_token(
         db.refresh(source_credentials)
 
         return source_credentials
+
+#company document
+
+def get_company_documents_by_source(source_id: int):
+    with SessionLocal() as db:
+        return (
+            db.query(CompanyDocument)
+            .filter(CompanyDocument.source_id == source_id)
+            .all()
+        )
+
+def get_company_document_by_external_file_id(external_file_id: str):
+    with SessionLocal() as db:
+        return (
+            db.query(CompanyDocument)
+            .filter(
+                CompanyDocument.external_file_id == external_file_id
+            )
+            .first()
+        )
