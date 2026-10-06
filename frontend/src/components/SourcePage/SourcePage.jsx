@@ -78,7 +78,7 @@ const SourcePage = ({sourceInfo}) => {
                 </div>
                 <div className="folder-selection-buttons">
                     <button  className="folder-select"
-                    >
+                      onClick={handleSelectFolder}>
                         Change root folder
                     </button>
                     <button  className="folder-remove"
