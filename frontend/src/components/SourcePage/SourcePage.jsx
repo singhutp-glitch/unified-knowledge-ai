@@ -8,11 +8,12 @@ import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
 
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
-  const [rootFolder,setRootFolder] = useState(null);
+  const [rootFolder,setRootFolder] = useState({});
 
    useEffect(() => {
         async function loadRootFolder() {
             const data = await getRootFolder();
+            console.log("root folder - ",data);
             setRootFolder(data);
         }
 
@@ -45,7 +46,7 @@ const SourcePage = ({sourceInfo}) => {
   const handleRemoveFolder =async ()=>{
      try{
       await removeRootFolder();
-      setRootFolder(null);
+      setRootFolder({});
     }catch(error){
       console.log(error);
     }
@@ -71,7 +72,7 @@ const SourcePage = ({sourceInfo}) => {
                 <div className="sync-folder-message">
                     Sync Folder:
                 </div>
-                {rootFolder?
+                {rootFolder.id?
                    <><div className="selected-folder">
                     {rootFolder.name}
                 </div>
