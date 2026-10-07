@@ -163,3 +163,33 @@ export async function getRootFolder(){
 }
 
 
+
+
+export async function getCheckoutChanges(){
+    console.log("checkout called")
+    const token = localStorage.getItem("token")
+    const response = await fetch(
+        `${API_BASE_URL}/sources/google-drive/changes`,
+        {
+            method: "GET",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    `Bearer ${token}`
+            },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to get drive changes"
+        );
+    }
+    console.log("checkout received");
+
+    const data = await response.json();
+    return data;
+    
+}
+

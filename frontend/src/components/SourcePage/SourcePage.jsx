@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react'
 import "./SourcePage.css" 
 import { getPickerToken,putRootFolderId,removeRootFolder
-  ,getRootFolder
+  ,getRootFolder,getCheckoutChanges
  } from '../../services/sourceApi'
 import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
 
@@ -9,7 +9,7 @@ import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
   const [rootFolder,setRootFolder] = useState({});
-  const [syncChanges,setSyncChanges] = useState("notUpdated");
+  const [checkoutChanges,setCheckoutChanges] = useState("notUpdated");
 
    useEffect(() => {
         async function loadRootFolder() {
@@ -22,8 +22,9 @@ const SourcePage = ({sourceInfo}) => {
     }, []);
   
   async function handleCheckoutClick(){
-    const changes = await getSyncChanges();
-    setSyncChanges(changes);
+    const result = await getCheckoutChanges();
+
+    setCheckoutChanges(result.changes);
   }
 
   async function handleFolderSelected(folder) {
@@ -116,7 +117,7 @@ const SourcePage = ({sourceInfo}) => {
           <div className="sync-status-page">
             sync status page
             <br />
-            <button className="checkout-button">
+            <button onClick={handleCheckoutClick} className="checkout-button">
               checkout
             </button>
             <div className="changes-text">
@@ -124,9 +125,9 @@ const SourcePage = ({sourceInfo}) => {
             </div>
             <div className="changes">
               {
-                syncChanges==="notUpdated"?
+                checkoutChanges==="notUpdated"?
                 "not checked yet":
-                syncChanges.map((change)=><div>change</div>)
+                checkoutChanges.map((change)=><div className='change-item'>{change.type} - {change.file.name}</div>)
               }
             </div>
           </div>

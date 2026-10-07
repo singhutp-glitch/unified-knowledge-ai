@@ -10,6 +10,7 @@ from app.sources.google_drive.oauth import create_authorization_url
 from app.sources.google_drive.oauth_state import oauth_states
 
 from app.services import google_drive_service
+from app.services import drive_changes_service
 
 def connect_google_drive(user_id: int):
 
@@ -327,3 +328,54 @@ def get_google_drive_root_folder():
             "id": source.root_folder_id,
             "name": source.root_folder_name
             }
+
+
+def get_google_drive_changes(user_id):
+
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    if not source.root_folder_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Google Drive root folder is not selected"
+        )
+
+    credentials = db_services.get_source_credentials_by_source_id(
+        source.id
+    )
+
+    if not credentials:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive credentials not found"
+        )
+
+    drive_files = google_drive_service.list_files_in_root_folder(
+        credentials,
+        source.root_folder_id
+    )
+
+    company_documents = (
+        db_services.get_company_documents_by_source(
+            source.id
+        )
+    )
+
+    changes = drive_changes_service.calculate_changes(
+        drive_files,
+        company_documents
+    )
+
+    return {
+        "root_folder": {
+            "id": source.root_folder_id,
+            "name": source.root_folder_name
+        },
+        **changes
+    }

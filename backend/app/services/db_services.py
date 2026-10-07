@@ -4,7 +4,7 @@ from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message
-from app.models import Chunk, Source, SourceCredential
+from app.models import Chunk, Source, SourceCredential,CompanyDocument
 from datetime import datetime
 
 
