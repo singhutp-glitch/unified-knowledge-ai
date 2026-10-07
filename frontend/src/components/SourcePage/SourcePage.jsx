@@ -21,6 +21,21 @@ const SourcePage = ({sourceInfo}) => {
         loadRootFolder();
     }, []);
   
+async function handleSyncAll(){
+  try{  
+      const payload = {
+        external_file_ids: checkoutChanges.map(
+        change => change.file.id
+    )
+};
+  await syncAllCheckoutChanges(payload);
+
+  }catch(error){
+    console.error(error);
+  }
+
+}
+
   async function handleCheckoutClick(){
     const result = await getCheckoutChanges();
 
@@ -61,80 +76,132 @@ const SourcePage = ({sourceInfo}) => {
   }
 
   return (
-    <div className='admin-source-page'>
-      <div className="admin-source-bar">
-        <div className="admin-source-bar-tabs">
-          {sourceInfo.name}
-        </div>
-        <div className="admin-source-bar-tabs" onClick={()=>{
-          setSelectedTab("syncFolder")
-        }}>
-          Sync Folder
-        </div>
-        <div className="admin-source-bar-tabs" onClick={()=>{
-          setSelectedTab("syncStatus")
-        }}>
-          Sync Status
-        </div>
+  <div className="admin-source-page">
+    <div className="admin-source-bar">
+      <div className="admin-source-bar-tabs">
+        {sourceInfo.name}
       </div>
-      <div className="admin-source-page-main">
-        {
-          selectedTab==='syncFolder'?
-          <div className="sync-folder-page">
-            sync-folder page
-            <div className="sync-folder-items">
-                <div className="sync-folder-message">
-                    Sync Folder:
-                </div>
-                {rootFolder.id?
-                   <><div className="selected-folder">
-                    {rootFolder.name}
-                </div>
-                <div className="folder-selection-buttons">
-                    <button  className="folder-select"
-                      onClick={handleSelectFolder}>
-                        Change root folder
-                    </button>
-                    <button  className="folder-remove"
-                    onClick={handleRemoveFolder}
-                    >
-                        Remove root Folder
-                    </button>
-                </div></>
-                    :
-                      <><div className="selected-folder">
-                    No Folder Selected
-                </div>
-                <div className="folder-selection-buttons">
-                    <button  className="folder-select"
-                    onClick={handleSelectFolder}>
-                        Select a folder
-                    </button>
-                </div></>
-                }
-            </div>
-          </div>:
-          <div className="sync-status-page">
-            sync status page
-            <br />
-            <button onClick={handleCheckoutClick} className="checkout-button">
-              checkout
-            </button>
-            <div className="changes-text">
-              changes:
-            </div>
-            <div className="changes">
-              {
-                checkoutChanges==="notUpdated"?
-                "not checked yet":
-                checkoutChanges.map((change)=><div className='change-item'>{change.type} - {change.file.name}</div>)
-              }
-            </div>
-          </div>
-        }
+
+      <div
+        className="admin-source-bar-tabs"
+        onClick={() => {
+          setSelectedTab("syncFolder");
+        }}
+      >
+        Sync Folder
+      </div>
+
+      <div
+        className="admin-source-bar-tabs"
+        onClick={() => {
+          setSelectedTab("checkout");
+        }}
+      >
+        Checkout
+      </div>
+      <div
+        className="admin-source-bar-tabs"
+        onClick={() => {
+          setSelectedTab("syncStatus");
+        }}
+      >
+        Sync Status
       </div>
     </div>
-  )
+
+    <div className="admin-source-page-main">
+      {selectedTab === "syncFolder" ? (
+        <div className="sync-folder-page">
+          sync-folder page
+
+          <div className="sync-folder-items">
+            <div className="sync-folder-message">
+              Sync Folder:
+            </div>
+
+            {rootFolder.id ? (
+              <>
+                <div className="selected-folder">
+                  {rootFolder.name}
+                </div>
+
+                <div className="folder-selection-buttons">
+                  <button
+                    className="folder-select"
+                    onClick={handleSelectFolder}
+                  >
+                    Change root folder
+                  </button>
+
+                  <button
+                    className="folder-remove"
+                    onClick={handleRemoveFolder}
+                  >
+                    Remove root Folder
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="selected-folder">
+                  No Folder Selected
+                </div>
+
+                <div className="folder-selection-buttons">
+                  <button
+                    className="folder-select"
+                    onClick={handleSelectFolder}
+                  >
+                    Select a folder
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      ) : selectedTab === "checkout" ? (
+        <div className="checkout-page">
+          checkout page
+
+          <br />
+
+          <button
+            onClick={handleCheckoutClick}
+            className="checkout-button"
+          >
+            checkout
+          </button>
+
+          <div className="changes-text">
+            changes:
+            {typeof(checkoutChanges)=== "object" &&<button
+            className="sync-all-button"
+          >
+            sync all
+          </button>}
+          </div>
+
+          <div className="changes">
+            {checkoutChanges === "notUpdated"
+              ? "not checked yet"
+              : checkoutChanges.map((change) => (
+                  <div
+                    key={change.file.id}
+                    className="change-item"
+                  >
+                    {change.type} - {change.file.name}
+                  </div>
+                ))}
+          </div>
+        </div>
+      ) : (
+        <div className="sync-status-page">
+          sync status page
+        </div>
+      )}
+    </div>
+  </div>
+)
 }
 
 export default SourcePage
