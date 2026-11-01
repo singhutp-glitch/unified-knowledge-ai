@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse
 from app.dependencies.auth import get_current_user
 from app.controllers import source_controller
 
-from app.schemas.source import (RootFolderRequest)
+from app.schemas.source import (RootFolderRequest, SyncRequest)
 
 
 router = APIRouter( tags=["sources"])
@@ -67,3 +67,11 @@ def get_source_changes(
     user_id: int = Depends(get_current_user)
 ):
     return source_controller.get_google_drive_changes(user_id)
+
+
+@router.post("/google-drive/sync")
+def sync_source_changes(
+    sync_changes:SyncRequest,
+    user_id: int = Depends(get_current_user)
+):
+    return source_controller.sync_all_google_drive_changes(sync_changes,user_id)

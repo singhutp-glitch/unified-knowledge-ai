@@ -85,3 +85,51 @@ def calculate_changes(drive_files, company_documents):
         },
         "changes": added + updated + removed
     }
+
+
+def validate_changes(sync_changes: list[str], changes: dict) -> dict:
+
+    # Get the actual changes calculated by the backend
+    current_changes = changes.get("changes", [])
+
+    # Create a lookup using Google Drive file IDs
+    changes_by_id = {
+        change["file"]["id"]: change
+        for change in current_changes
+    }
+
+    valid_changes = []
+    invalid_ids = []
+    duplicate_ids = []
+    seen_ids = set()
+
+    # Validate every ID received from the frontend
+    for file_id in sync_changes:
+
+        # Check for duplicate IDs
+        if file_id in seen_ids:
+            duplicate_ids.append(file_id)
+            continue
+
+        seen_ids.add(file_id)
+
+        # Check whether the ID represents an actual change
+        change = changes_by_id.get(file_id)
+
+        if change is None:
+            invalid_ids.append(file_id)
+        else:
+            valid_changes.append(change)
+
+    is_valid = (
+        len(sync_changes) > 0
+        and len(invalid_ids) == 0
+        and len(duplicate_ids) == 0
+    )
+
+    return {
+        "is_valid": is_valid,
+        "changes_to_sync": valid_changes if is_valid else [],
+        "invalid_ids": invalid_ids,
+        "duplicate_ids": duplicate_ids
+    }

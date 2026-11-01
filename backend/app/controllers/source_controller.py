@@ -379,3 +379,66 @@ def get_google_drive_changes(user_id):
         },
         **changes
     }
+
+
+
+def sync_all_google_drive_changes(sync_changes,user_id):
+
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    if not source.root_folder_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Google Drive root folder is not selected"
+        )
+
+    credentials = db_services.get_source_credentials_by_source_id(
+        source.id
+    )
+
+    if not credentials:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive credentials not found"
+        )
+
+    drive_files = google_drive_service.list_files_in_root_folder(
+        credentials,
+        source.root_folder_id
+    )
+
+    company_documents = (
+        db_services.get_company_documents_by_source(
+            source.id
+        )
+    )
+
+    changes = drive_changes_service.calculate_changes(
+        drive_files,
+        company_documents
+    )
+
+    validation_result = drive_changes_service.validate_changes(
+    sync_changes,
+    changes
+)
+
+    if not validation_result["is_valid"]:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "message": "Some requested changes are no longer valid. Please check changes again.",
+                "invalid_ids": validation_result["invalid_ids"],
+                "duplicate_ids": validation_result["duplicate_ids"]
+            }
+        )
+
+    changes_to_sync = validation_result["changes_to_sync"]
+
+    return 
