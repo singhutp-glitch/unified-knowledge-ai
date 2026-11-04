@@ -9,6 +9,18 @@ from app.routes.source_routes import router as source_router
 
 from app.rag.routes.ingestion_routes import router as rag_router
 
+from app.core.redis_client import redis_client
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    try:
+        yield
+
+    finally:
+        await redis_client.aclose()
+
 app = FastAPI(title="Unified Knowledge AI")
 
 
