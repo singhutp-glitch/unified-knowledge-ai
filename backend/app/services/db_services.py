@@ -4,8 +4,8 @@ from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message
-from app.models import Chunk, Source, SourceCredential,CompanyDocument,SyncJob,
-SyncJobChange
+from app.models import (Chunk, Source, SourceCredential,CompanyDocument,SyncJob,
+SyncJobChange)
 from datetime import datetime, timezone, timedelta
 from app.constants import ACTIVE_SYNC_STATUSES,TERMINAL_SYNC_STATUSES
 

@@ -15,11 +15,11 @@ async def create_sync_job_and_enqueue(
     # This operation commits everything in one transaction.
 
     try:
-    sync_job_id = db_services.create_sync_job_with_changes(
-        source_id=source_id,
-        user_id=user_id,
-        changes=changes_to_sync
-    )
+        sync_job_id = db_services.create_sync_job_with_changes(
+            source_id=source_id,
+            user_id=user_id,
+            changes=changes_to_sync
+        )
 
     except IntegrityError:
         # Another request may have created the active job first.

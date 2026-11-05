@@ -383,7 +383,7 @@ def get_google_drive_changes(user_id):
 
 
 
-def sync_all_google_drive_changes(sync_changes,user_id):
+async def sync_all_google_drive_changes(sync_changes,user_id):
 
     source = db_services.get_source_by_type("google_drive")
 

@@ -87,7 +87,7 @@ def get_active_google_drive_sync(
 @router.get("/google-drive/sync-status/{sync_job_id}")
 def get_google_drive_sync_status(
     sync_job_id: int,
-    current_user: User = Depends(get_current_user)
+    user_id: int = Depends(get_current_user)
 ):
 
    return source_controller.find_google_drive_sync_status(sync_job_id)

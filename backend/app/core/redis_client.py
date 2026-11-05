@@ -4,7 +4,7 @@ from app.config import settings
 
 def create_redis_client() -> Redis:
     return Redis.from_url(
-        settings.REDIS_URL,
+        settings.redis_url,
         decode_responses=True
     )
 
