@@ -11,6 +11,7 @@ from app.sources.google_drive.oauth_state import oauth_states
 
 from app.services import google_drive_service
 from app.services import drive_changes_service
+from app.services.sync_job import sync_job_service 
 
 def connect_google_drive(user_id: int):
 
@@ -391,6 +392,15 @@ def sync_all_google_drive_changes(sync_changes,user_id):
             status_code=404,
             detail="Google Drive is not connected"
         )
+    
+    active_job = db_services.get_active_sync_job(source.id)
+
+    if active_job:
+        return {
+            "sync_job_id": active_job.id,
+            "status": active_job.status,
+            "message": "A synchronization job is already active."
+        }
 
     if not source.root_folder_id:
         raise HTTPException(
@@ -441,4 +451,63 @@ def sync_all_google_drive_changes(sync_changes,user_id):
 
     changes_to_sync = validation_result["changes_to_sync"]
 
-    return 
+    job_result = await sync_job_service.create_sync_job_and_enqueue(
+        source_id=source.id,
+        user_id=user_id,
+        changes_to_sync=changes_to_sync
+    )
+
+    return job_result
+
+def find_active_google_drive_sync():
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        return {
+            "active": False,
+            "job": None
+        }
+
+    # Verify that this authenticated user has permission
+    # to access this source.
+
+    job = db_services.get_active_sync_job_details(source.id)
+
+    if not job:
+        return {
+            "active": False,
+            "job": None
+        }
+
+    return {
+        "active": True,
+        "job": job
+    }
+
+def find_google_drive_sync_status(sync_job_id):
+     # 1. Verify that Google Drive is connected
+    source = db_services.get_source_by_type("google_drive")
+
+    if not source:
+        raise HTTPException(
+            status_code=404,
+            detail="Google Drive is not connected"
+        )
+
+    # 2. Verify that the user can access this source
+    # Apply your existing source-level authorization logic here.
+
+    # 3. Retrieve the requested sync job
+    job = db_services.get_sync_job_details(
+        sync_job_id=sync_job_id,
+        source_id=source.id
+    )
+
+    if not job:
+        raise HTTPException(
+            status_code=404,
+            detail="Sync job not found"
+        )
+
+    # 4. Return current job progress
+    return job

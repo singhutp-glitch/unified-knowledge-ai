@@ -214,5 +214,55 @@ export async function syncAllCheckoutChanges(payload){
     
 }
 
+export async function getActiveSyncJob(){
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+        `${API_BASE_URL}/sources/google-drive/active-sync`,
+        {
+            method: "GET",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to start syncing changes"
+        );
+    }
+    const data = await response.json();
+    return data;
+    
+}
+
+
+export async function getSyncStatus(jobId){
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+        `${API_BASE_URL}/sources/google-drive/sync-status/${jobId}`,
+        {
+            method: "GET",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to start syncing changes"
+        );
+    }
+    const data = await response.json();
+    return data;
+    
+}
 
 

@@ -8,20 +8,37 @@ from app.routes.auth_routes import router as auth_router
 from app.routes.source_routes import router as source_router
 
 from app.rag.routes.ingestion_routes import router as rag_router
-
 from app.core.redis_client import redis_client
-
+from app.workers.sync_consumer import run_consumer
+import asyncio
+from contextlib import (
+    asynccontextmanager,
+    suppress
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
+    # Start the Redis consumer as a background task
+    consumer_task = asyncio.create_task(
+        run_consumer()
+    )
 
     try:
         yield
 
     finally:
+        # Stop the consumer
+        consumer_task.cancel()
+
+        with suppress(asyncio.CancelledError):
+            await consumer_task
+
+        # Close the application's own Redis connection
         await redis_client.aclose()
 
-app = FastAPI(title="Unified Knowledge AI")
+
+app = FastAPI(lifespan=lifespan)
 
 
 app.add_middleware(

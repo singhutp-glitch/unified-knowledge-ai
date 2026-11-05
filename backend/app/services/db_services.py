@@ -4,8 +4,10 @@ from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message
-from app.models import Chunk, Source, SourceCredential,CompanyDocument
-from datetime import datetime
+from app.models import Chunk, Source, SourceCredential,CompanyDocument,SyncJob,
+SyncJobChange
+from datetime import datetime, timezone, timedelta
+from app.constants import ACTIVE_SYNC_STATUSES,TERMINAL_SYNC_STATUSES
 
 
 def get_user_by_email(email: str):
@@ -345,3 +347,336 @@ def get_company_document_by_external_file_id(external_file_id: str):
             )
             .first()
         )
+
+
+#sync_job
+
+def create_sync_job_with_changes(
+    source_id,
+    user_id,
+    changes
+):
+    db = SessionLocal()
+
+    try:
+        # Create parent job
+        sync_job = SyncJob(
+            source_id=source_id,
+            user_id=user_id,
+            status="queued",
+            total_files=len(changes),
+            completed_files=0,
+            failed_files=0
+        )
+
+        db.add(sync_job)
+
+        # Generate parent ID without committing
+        db.flush()
+
+        # Create child records
+        for change in changes:
+
+            job_change = SyncJobChange(
+                sync_job_id=sync_job.id,
+                external_file_id=change["external_file_id"],
+                file_name=change["file_name"],
+                change_type=change["type"],
+                status="queued"
+            )
+
+            db.add(job_change)
+
+        # Commit parent and children together
+        db.commit()
+
+        return sync_job.id
+
+    except Exception:
+        db.rollback()
+        raise
+
+    finally:
+        db.close()
+
+
+def update_sync_job_dispatch_error(sync_job_id, error):
+
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(SyncJob)
+            .filter(SyncJob.id == sync_job_id)
+            .first()
+        )
+
+        if not job:
+            raise ValueError(
+                f"SyncJob {sync_job_id} not found"
+            )
+
+        job.dispatch_error = error
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise
+
+    finally:
+        db.close()
+
+
+def mark_sync_job_enqueued(sync_job_id, redis_message_id):
+
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(SyncJob)
+            .filter(SyncJob.id == sync_job_id)
+            .first()
+        )
+
+        if not job:
+            raise ValueError(
+                f"SyncJob {sync_job_id} not found"
+            )
+
+        job.redis_message_id = redis_message_id
+        job.enqueued_at = datetime.now(timezone.utc)
+        job.dispatch_error = None
+
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise
+
+    finally:
+        db.close()
+
+
+def claim_sync_job(
+    sync_job_id,
+    worker_id,
+    lease_minutes=45
+):
+
+    db = SessionLocal()
+
+    terminal_statuses = {
+        "completed",
+        "completed_with_errors",
+        "failed",
+        "cancelled"
+    }
+
+    try:
+        with db.begin():
+
+            job = (
+                db.query(SyncJob)
+                .filter(SyncJob.id == sync_job_id)
+                .with_for_update()
+                .first()
+            )
+
+            if not job:
+                return "not_found"
+
+            if job.status in terminal_statuses:
+                return "terminal"
+
+            now = datetime.now(timezone.utc)
+
+            # Another worker still has a valid lease
+            if (
+                job.status == "processing"
+                and job.locked_until is not None
+                and job.locked_until > now
+            ):
+                return "active"
+
+            if job.status not in ("queued", "processing"):
+                return "not_claimable"
+
+            # Claim the job
+            job.status = "processing"
+            job.locked_by = worker_id
+            job.locked_until = now + timedelta(
+                minutes=lease_minutes
+            )
+
+            job.attempts += 1
+
+            if job.started_at is None:
+                job.started_at = now
+
+            return "claimed"
+
+    except Exception:
+        raise
+
+    finally:
+        db.close()
+
+
+def get_sync_job_status(sync_job_id):
+
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(SyncJob)
+            .filter(SyncJob.id == sync_job_id)
+            .first()
+        )
+
+        return job.status if job else None
+
+    finally:
+        db.close()
+
+
+def get_active_sync_job(source_id):
+
+    db = SessionLocal()
+
+    try:
+        return (
+            db.query(SyncJob)
+            .filter(
+                SyncJob.source_id == source_id,
+                SyncJob.status.in_(ACTIVE_SYNC_STATUSES)
+            )
+            .order_by(SyncJob.created_at.desc())
+            .first()
+        )
+
+    finally:
+        db.close()
+
+
+def get_active_sync_job_details(source_id):
+
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(SyncJob)
+            .filter(
+                SyncJob.source_id == source_id,
+                SyncJob.status.in_(ACTIVE_SYNC_STATUSES)
+            )
+            .order_by(SyncJob.created_at.desc())
+            .first()
+        )
+
+        if not job:
+            return None
+
+        changes = (
+            db.query(SyncJobChange)
+            .filter(
+                SyncJobChange.sync_job_id == job.id
+            )
+            .order_by(SyncJobChange.id)
+            .all()
+        )
+
+        return {
+            "id": job.id,
+            "status": job.status,
+            "total_files": job.total_files,
+            "completed_files": job.completed_files,
+            "failed_files": job.failed_files,
+            "created_at": job.created_at.isoformat(),
+            "changes": [
+                {
+                    "id": change.id,
+                    "external_file_id": change.external_file_id,
+                    "file_name": change.file_name,
+                    "change_type": change.change_type,
+                    "status": change.status,
+                    "error_message": change.error_message
+                }
+                for change in changes
+            ]
+        }
+
+    finally:
+        db.close()
+
+def get_sync_job_details(sync_job_id, source_id):
+
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(SyncJob)
+            .filter(
+                SyncJob.id == sync_job_id,
+                SyncJob.source_id == source_id
+            )
+            .first()
+        )
+
+        if not job:
+            return None
+
+        changes = (
+            db.query(SyncJobChange)
+            .filter(
+                SyncJobChange.sync_job_id == job.id
+            )
+            .order_by(SyncJobChange.id)
+            .all()
+        )
+
+        return {
+            "sync_job_id": job.id,
+            "source_id": job.source_id,
+            "status": job.status,
+            "total_files": job.total_files,
+            "completed_files": job.completed_files,
+            "failed_files": job.failed_files,
+            "created_at": (
+                job.created_at.isoformat()
+                if job.created_at else None
+            ),
+            "started_at": (
+                job.started_at.isoformat()
+                if job.started_at else None
+            ),
+            "completed_at": (
+                job.completed_at.isoformat()
+                if job.completed_at else None
+            ),
+            "last_error": job.last_error,
+
+            "changes": [
+                {
+                    "id": change.id,
+                    "external_file_id": change.external_file_id,
+                    "file_name": change.file_name,
+                    "change_type": change.change_type,
+                    "status": change.status,
+                    "attempts": change.attempts,
+                    "error_message": change.error_message,
+                    "started_at": (
+                        change.started_at.isoformat()
+                        if change.started_at else None
+                    ),
+                    "completed_at": (
+                        change.completed_at.isoformat()
+                        if change.completed_at else None
+                    )
+                }
+                for change in changes
+            ]
+        }
+
+    finally:
+        db.close()

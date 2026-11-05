@@ -8,12 +8,15 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
-    Column
+    Column,
+    CheckConstraint,
+    Index,
+    func,
+    text
 )
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
-
 
 class Base(DeclarativeBase):
     pass
@@ -390,3 +393,214 @@ class SourceCredential(Base):
     access_token = Column(Text, nullable=False)
     refresh_token = Column(Text, nullable=True)
     token_expiry = Column(DateTime, nullable=True)
+
+
+
+class SyncJob(Base):
+    __tablename__ = "sync_jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Job ownership and source
+    source_id = Column(
+        Integer,
+        ForeignKey("sources.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True
+    )
+
+    # Overall job status
+    status = Column(
+        String(30),
+        nullable=False,
+        default="queued",
+        server_default="queued"
+    )
+
+    # Progress tracking
+    total_files = Column(Integer, nullable=False, default=0)
+    completed_files = Column(Integer, nullable=False, default=0)
+    failed_files = Column(Integer, nullable=False, default=0)
+
+    # Processing attempts and recovery
+    attempts = Column(Integer, nullable=False, default=0)
+
+    locked_by = Column(String(100), nullable=True)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
+
+    # Redis dispatch tracking
+    redis_message_id = Column(String(100), nullable=True)
+    enqueued_at = Column(DateTime(timezone=True), nullable=True)
+    dispatch_error = Column(Text, nullable=True)
+
+    # General error tracking
+    last_error = Column(Text, nullable=True)
+
+    # Timestamps
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    started_at = Column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    completed_at = Column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+    # Relationships
+    changes = relationship(
+        "SyncJobChange",
+        back_populates="sync_job",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
+
+    source = relationship("Source")
+    user = relationship("User")
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('queued', 'processing', 'completed', "
+            "'completed_with_errors', 'failed', 'cancelled')",
+            name="check_sync_job_status"
+        ),
+
+        CheckConstraint(
+            "total_files >= 0 AND completed_files >= 0 "
+            "AND failed_files >= 0",
+            name="check_sync_job_counts"
+        ),
+
+        Index(
+            "ix_sync_jobs_source_status",
+            "source_id",
+            "status"
+        ),
+        Index(
+            "uq_sync_jobs_one_active_per_source",
+            "source_id",
+            unique=True,
+            postgresql_where=text(
+                "status IN ('queued', 'processing')"
+            )
+        ),
+    )
+
+
+class SyncJobChange(Base):
+    __tablename__ = "sync_job_changes"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Parent job
+    sync_job_id = Column(
+        Integer,
+        ForeignKey("sync_jobs.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    # Google Drive file information
+    external_file_id = Column(
+        String(255),
+        nullable=False
+    )
+
+    file_name = Column(
+        String(500),
+        nullable=False
+    )
+
+    # Operation: added, updated or removed
+    change_type = Column(
+        String(30),
+        nullable=False
+    )
+
+    # Individual file processing status
+    status = Column(
+        String(30),
+        nullable=False,
+        default="queued",
+        server_default="queued"
+    )
+
+    # Retry and error information
+    attempts = Column(Integer, nullable=False, default=0)
+
+    error_message = Column(Text, nullable=True)
+
+    # Processing timestamps
+    started_at = Column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    completed_at = Column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+    # Relationship with parent job
+    sync_job = relationship(
+        "SyncJob",
+        back_populates="changes"
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "change_type IN ('added', 'updated', 'removed')",
+            name="check_sync_change_type"
+        ),
+
+        CheckConstraint(
+            "status IN ('queued', 'processing', 'completed', "
+            "'failed', 'skipped')",
+            name="check_sync_change_status"
+        ),
+
+        UniqueConstraint(
+            "sync_job_id",
+            "external_file_id",
+            name="uq_sync_job_external_file"
+        ),
+
+        Index(
+            "ix_sync_job_changes_status",
+            "sync_job_id",
+            "status"
+        ),
+    )

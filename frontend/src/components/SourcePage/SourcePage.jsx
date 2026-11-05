@@ -1,17 +1,20 @@
 import React, { useState,useEffect } from 'react'
 import "./SourcePage.css" 
 import { getPickerToken,putRootFolderId,removeRootFolder
-  ,getRootFolder,getCheckoutChanges
- } from '../../services/sourceApi'
+  ,getRootFolder,getCheckoutChanges, syncAllCheckoutChanges,
+ getActiveSyncJob } from '../../services/sourceApi'
 import { openGoogleDrivePicker } from '../../services/googleDriverPicker'
+import SyncStatusPage from '../SyncStatusPage/SyncStatusPage'
 
 
 const SourcePage = ({sourceInfo}) => {
   const [selectedTab,setSelectedTab] = useState("syncFolder")
   const [rootFolder,setRootFolder] = useState({});
   const [checkoutChanges,setCheckoutChanges] = useState("notUpdated");
-
-   useEffect(() => {
+  const [disableSyncAll,setDisableSyncAll] = useState(false);
+  const [syncJob,setSyncJob] = useState(null);
+  
+  useEffect(() => {
         async function loadRootFolder() {
             const data = await getRootFolder();
             console.log("root folder - ",data);
@@ -20,6 +23,31 @@ const SourcePage = ({sourceInfo}) => {
 
         loadRootFolder();
     }, []);
+
+    useEffect(() => {
+
+    async function checkActiveSync() {
+
+        try {
+            const data = await getActiveSyncJob();
+
+            if (data.active) {
+
+                setSyncJob(data.job);
+            }
+
+        } catch (error) {
+            console.error(
+                "Failed to check active sync",
+                error
+            );
+        }
+    }
+
+    checkActiveSync();
+
+}, []);
+    
   
 async function handleSyncAll(){
   try{  
@@ -28,7 +56,10 @@ async function handleSyncAll(){
         change => change.file.id
     )
 };
-  await syncAllCheckoutChanges(payload);
+ setDisableSyncAll(true);
+ const statusResponse = await syncAllCheckoutChanges(payload);
+ setDisableSyncAll(false);
+ setSyncJob(statusResponse);
 
   }catch(error){
     console.error(error);
@@ -174,9 +205,9 @@ async function handleSyncAll(){
 
           <div className="changes-text">
             changes:
-            {typeof(checkoutChanges)=== "object" &&<button
-            className="sync-all-button"
-          >
+            {typeof(checkoutChanges)=== "object" &&
+            <button className="sync-all-button" onClick={handleSyncAll} 
+            disabled={disableSyncAll}>
             sync all
           </button>}
           </div>
@@ -195,9 +226,7 @@ async function handleSyncAll(){
           </div>
         </div>
       ) : (
-        <div className="sync-status-page">
-          sync status page
-        </div>
+        <SyncStatusPage syncJob={syncJob} setSyncJob={setSyncJob}/>
       )}
     </div>
   </div>
