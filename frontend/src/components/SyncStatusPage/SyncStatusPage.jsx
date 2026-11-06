@@ -13,11 +13,12 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
             async function fetchSyncStatus() {
     
                 try {
-                    const response = await getSyncStatus(syncJob.id)
+                    console.log("sync-job-id",syncJob);
+                    const response = await getSyncStatus(syncJob.sync_job_id)
     
                     if (cancelled) return;
     
-                    const job = response.data;
+                    const job = response;
     
                     setSyncJob(job);
     
@@ -27,8 +28,10 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
                         "failed",
                         "cancelled"
                     ];
-    
+                    console.log("match - ",terminalStatuses.includes(job.status));
+
                     if (terminalStatuses.includes(job.status)) {
+                        console.log("job completed");
                         return;
                     }
     

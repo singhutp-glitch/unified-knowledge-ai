@@ -1,10 +1,10 @@
 from app.services import db_services
-
+import time
 
 def process_sync_job(sync_job_id: int):
 
     print(f"Starting test processing for job {sync_job_id}")
-
+    time.sleep(20)
     # Simulate successful processing of all documents
     db_services.mark_sync_job_successful_for_testing(
         sync_job_id

@@ -665,7 +665,7 @@ def get_active_sync_job_details(source_id):
         )
 
         return {
-            "id": job.id,
+            "sync_job_id": job.id,
             "status": job.status,
             "total_files": job.total_files,
             "completed_files": job.completed_files,

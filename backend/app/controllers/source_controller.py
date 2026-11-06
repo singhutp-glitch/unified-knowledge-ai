@@ -509,6 +509,6 @@ def find_google_drive_sync_status(sync_job_id):
             status_code=404,
             detail="Sync job not found"
         )
-
-    # 4. Return current job progress
+    print("sent job - ",job)
+    # 4. Return current job progressSync job 5 completed successfully
     return job
