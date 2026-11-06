@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
             await consumer_task
 
         # Close the application's own Redis connection
-        await redis_client.aclose()
+        redis_client.close()
 
 
 app = FastAPI(lifespan=lifespan)

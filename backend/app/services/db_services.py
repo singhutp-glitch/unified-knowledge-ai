@@ -379,8 +379,8 @@ def create_sync_job_with_changes(
 
             job_change = SyncJobChange(
                 sync_job_id=sync_job.id,
-                external_file_id=change["external_file_id"],
-                file_name=change["file_name"],
+                external_file_id=change["file"]["id"],
+                file_name=change["file"]["name"],
                 change_type=change["type"],
                 status="queued"
             )
@@ -515,6 +515,84 @@ def claim_sync_job(
                 job.started_at = now
 
             return "claimed"
+
+    except Exception:
+        raise
+
+    finally:
+        db.close()
+
+
+def mark_sync_job_successful_for_testing(sync_job_id):
+
+    db = SessionLocal()
+
+    try:
+        with db.begin():
+
+            # 1. Fetch and lock the parent job
+            job = (
+                db.query(SyncJob)
+                .filter(SyncJob.id == sync_job_id)
+                .with_for_update()
+                .first()
+            )
+
+            if not job:
+                raise ValueError(
+                    f"Sync job {sync_job_id} not found"
+                )
+
+            # 2. Fetch and lock all child records
+            changes = (
+                db.query(SyncJobChange)
+                .filter(
+                    SyncJobChange.sync_job_id == sync_job_id
+                )
+                .with_for_update()
+                .all()
+            )
+
+            # Verify that all expected child records exist
+            if len(changes) != job.total_files:
+                raise ValueError(
+                    f"Expected {job.total_files} changes, "
+                    f"but found {len(changes)}"
+                )
+
+            now = datetime.now(timezone.utc)
+
+            # 3. Mark every document change as completed
+            for change in changes:
+
+                change.status = "completed"
+                change.error_message = None
+
+                if change.started_at is None:
+                    change.started_at = now
+
+                change.completed_at = now
+
+            # 4. Update parent job progress
+            job.completed_files = len(changes)
+            job.failed_files = 0
+
+            # 5. Mark parent job as completed
+            job.status = "completed"
+            job.completed_at = now
+
+            if job.started_at is None:
+                job.started_at = now
+
+            job.last_error = None
+
+            # 6. Release processing lock
+            job.locked_by = None
+            job.locked_until = None
+
+        # Transaction automatically commits here
+
+        return True
 
     except Exception:
         raise

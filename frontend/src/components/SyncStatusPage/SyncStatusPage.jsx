@@ -1,4 +1,4 @@
-import React from 'react'
+import {useEffect} from 'react'
 import "./SyncStatusPage.css"
 import { getSyncStatus } from '../../services/sourceApi';
 
@@ -71,7 +71,7 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
                     </p>
                 </div>
             ) : (
-                <p>Loading synchronization status...</p>
+                <p>No synchronization yet</p>
             )}
         </div>
   )

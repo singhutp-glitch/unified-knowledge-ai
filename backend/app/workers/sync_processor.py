@@ -1,25 +1,15 @@
+from app.services import db_services
+
+
 def process_sync_job(sync_job_id: int):
 
-    # 1. Fetch the SyncJob from PostgreSQL.
+    print(f"Starting test processing for job {sync_job_id}")
 
-    # 2. Fetch its SyncJobChange records.
+    # Simulate successful processing of all documents
+    db_services.mark_sync_job_successful_for_testing(
+        sync_job_id
+    )
 
-    # 3. Process each document:
-    #       - Mark the change as processing.
-    #       - Download from Google Drive.
-    #       - Extract document content.
-    #       - Chunk the content.
-    #       - Generate embeddings.
-    #       - Store/update the document.
-    #       - Mark the change completed or failed.
+    print(f"Sync job {sync_job_id} completed successfully")
 
-    # 4. Recalculate parent job progress.
-
-    # 5. Set the final job status:
-    #       completed
-    #       completed_with_errors
-    #       failed
-
-    # 6. Clear locked_by and locked_until.
-
-    pass
+    return True

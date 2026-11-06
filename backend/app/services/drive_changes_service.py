@@ -107,6 +107,7 @@ def validate_changes(sync_changes: list[str], changes: dict) -> dict:
     for file_id in sync_changes:
 
         # Check for duplicate IDs
+        print("file_id: ",file_id)
         if file_id in seen_ids:
             duplicate_ids.append(file_id)
             continue

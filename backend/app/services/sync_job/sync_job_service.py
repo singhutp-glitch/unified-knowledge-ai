@@ -6,7 +6,7 @@ from app.core.redis_streams import STREAM_NAME
 from app.services import db_services
 from sqlalchemy.exc import IntegrityError
 
-async def create_sync_job_and_enqueue(
+def create_sync_job_and_enqueue(
     source_id,
     user_id,
     changes_to_sync
@@ -15,6 +15,7 @@ async def create_sync_job_and_enqueue(
     # This operation commits everything in one transaction.
 
     try:
+        print("start making sync_job")
         sync_job_id = db_services.create_sync_job_with_changes(
             source_id=source_id,
             user_id=user_id,
@@ -36,7 +37,8 @@ async def create_sync_job_and_enqueue(
 
     # 2. Publish the job ID to Redis
     try:
-        redis_message_id = await redis_client.xadd(
+        print("start job adding")
+        redis_message_id = redis_client.xadd(
             STREAM_NAME,
             {
                 "job_id": str(sync_job_id)
@@ -65,7 +67,7 @@ async def create_sync_job_and_enqueue(
         sync_job_id,
         redis_message_id
     )
-
+    print("return job data")
     # 4. Return job information
     return {
         "sync_job_id": sync_job_id,

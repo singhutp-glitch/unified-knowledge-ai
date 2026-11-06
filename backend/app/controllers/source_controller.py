@@ -383,7 +383,7 @@ def get_google_drive_changes(user_id):
 
 
 
-async def sync_all_google_drive_changes(sync_changes,user_id):
+def sync_all_google_drive_changes(sync_changes,user_id):
 
     source = db_services.get_source_by_type("google_drive")
 
@@ -435,7 +435,7 @@ async def sync_all_google_drive_changes(sync_changes,user_id):
     )
 
     validation_result = drive_changes_service.validate_changes(
-    sync_changes,
+    sync_changes.external_file_ids,
     changes
 )
 
@@ -450,13 +450,14 @@ async def sync_all_google_drive_changes(sync_changes,user_id):
         )
 
     changes_to_sync = validation_result["changes_to_sync"]
+    print("is_valid:",validation_result["is_valid"])
 
-    job_result = await sync_job_service.create_sync_job_and_enqueue(
+    job_result = sync_job_service.create_sync_job_and_enqueue(
         source_id=source.id,
         user_id=user_id,
         changes_to_sync=changes_to_sync
     )
-
+    print("job returned")
     return job_result
 
 def find_active_google_drive_sync():

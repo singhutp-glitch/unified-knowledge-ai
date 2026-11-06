@@ -1,13 +1,15 @@
-from redis.asyncio import Redis
+import redis
 from app.config import settings
 
 
-def create_redis_client() -> Redis:
-    return Redis.from_url(
+def create_sync_redis_client():
+
+    return redis.Redis.from_url(
         settings.redis_url,
-        decode_responses=True
+        decode_responses=True,
+        socket_connect_timeout=10,
+        socket_timeout=15
     )
 
-
 # Application-owned Redis client
-redis_client = create_redis_client()
+redis_client = create_sync_redis_client()

@@ -1,13 +1,26 @@
-from redis.asyncio import Redis
+import redis
+from redis.asyncio import Redis as AsyncRedis
+
 from app.config import settings
 
 
-def create_redis_client() -> Redis:
+# For the primary FastAPI application
+def create_sync_redis_client():
 
-    return Redis.from_url(
+    return redis.Redis.from_url(
         settings.redis_url,
         decode_responses=True,
         socket_connect_timeout=10,
-        socket_timeout=30,
-        health_check_interval=30
+        socket_timeout=15
+    )
+
+
+# For the Redis consumer
+def create_async_redis_client():
+
+    return AsyncRedis.from_url(
+        settings.redis_url,
+        decode_responses=True,
+        socket_connect_timeout=10,
+        socket_timeout=30
     )

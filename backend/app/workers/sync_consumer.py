@@ -1,7 +1,7 @@
 from app.services import db_services
 import asyncio
 import logging
-from app.core.redis_factory import create_redis_client
+from app.core.redis_factory import create_async_redis_client
 import uuid
 from app.core.redis_streams import (
     STREAM_NAME,
@@ -21,7 +21,7 @@ TERMINAL_STATUSES = {
     "cancelled"
 }
 
-PENDING_IDLE_MS = 60 * 60 * 1000  # 60 minutes
+PENDING_IDLE_MS = 60 * 1000  # 60 minutes
 
 
 async def handle_sync_message(redis, message_id, fields):
@@ -213,7 +213,7 @@ async def recover_pending_sync_jobs(redis):
     
 async def run_consumer():
 
-    redis = create_redis_client()
+    redis = create_async_redis_client()
 
     try:
         # Ensure the stream and consumer group exist
