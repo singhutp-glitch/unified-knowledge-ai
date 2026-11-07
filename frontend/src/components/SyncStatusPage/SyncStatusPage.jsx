@@ -13,7 +13,6 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
             async function fetchSyncStatus() {
     
                 try {
-                    console.log("sync-job-id",syncJob);
                     const response = await getSyncStatus(syncJob.sync_job_id)
     
                     if (cancelled) return;
@@ -28,8 +27,7 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
                         "failed",
                         "cancelled"
                     ];
-                    console.log("match - ",terminalStatuses.includes(job.status));
-
+                   
                     if (terminalStatuses.includes(job.status)) {
                         console.log("job completed");
                         return;
@@ -59,7 +57,7 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
                 clearTimeout(timeoutId);
             };
     
-        }, []);
+        }, [syncJob?.sync_job_id]);
   return (
     <div className="sync-status-page">
           <h2>Synchronization Status</h2>
