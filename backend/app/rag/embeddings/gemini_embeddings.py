@@ -9,7 +9,7 @@ ai = genai.Client(
 )
 
 
-async def gemini_embeddings(texts):
+def gemini_embeddings(texts):
 
     response = ai.models.embed_content(
         model="gemini-embedding-2",
@@ -25,7 +25,7 @@ async def gemini_embeddings(texts):
     ]
 
 
-async def gemini_query_embedding(text):
+def gemini_query_embedding(text):
 
     response = ai.models.embed_content(
         model="gemini-embedding-2",

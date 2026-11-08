@@ -9,12 +9,12 @@ router = APIRouter(tags=["RAG"])
 
 
 @router.post("/chats/{chat_id}/documents")
-async def upload_document(
+def upload_document(
     chat_id: int,
     document: UploadFile = File(...),
     user_id: int = Depends(get_current_user)
 ):
-    return await ingestion.post_upload_document(
+    return ingestion.post_upload_document(
         document,
         chat_id,
         user_id

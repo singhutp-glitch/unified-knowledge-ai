@@ -10,11 +10,11 @@ PARSER_MAP = {
 }
 
 
-async def parse_document(file: UploadFile):
+def parse_document(file: UploadFile):
 
     parser = PARSER_MAP.get(file.content_type)
 
     if parser is None:
         raise ValueError("Unsupported file type")
 
-    return await parser(file)
+    return parser(file)

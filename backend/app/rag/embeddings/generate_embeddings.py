@@ -1,7 +1,7 @@
 from app.rag.embeddings.gemini_embeddings import gemini_embeddings
 
 
-async def generate_embeddings(chunks):
+def generate_embeddings(chunks):
 
     batch_size = 50
     all_embeddings = []
@@ -26,7 +26,7 @@ async def generate_embeddings(chunks):
             for chunk in batch
         ]
 
-        embeddings = await gemini_embeddings(texts)
+        embeddings = gemini_embeddings(texts)
 
         if len(embeddings) != len(batch):
             raise ValueError("Embedding count mismatch")

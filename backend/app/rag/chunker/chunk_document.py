@@ -4,7 +4,7 @@ from app.rag.chunker.strategies.structure_aware_chunker import (
 )
 
 
-async def chunk_document(parsed_document):
+def chunk_document(parsed_document):
     chunks = structure_aware_chunking(
         parsed_document
     )

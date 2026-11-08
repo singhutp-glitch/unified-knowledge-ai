@@ -8,7 +8,7 @@ from app.models import (Chunk, Source, SourceCredential,CompanyDocument,SyncJob,
 SyncJobChange)
 from datetime import datetime, timezone, timedelta
 from app.constants import ACTIVE_SYNC_STATUSES,TERMINAL_SYNC_STATUSES
-
+from sqlalchemy import func
 
 def get_user_by_email(email: str):
     with SessionLocal() as db:
@@ -801,6 +801,224 @@ def get_sync_job_for_processing(sync_job_id):
                 for change in changes
             ]
         }
+
+    finally:
+        db.close()
+
+
+def update_sync_job_change_status(
+    change_id,
+    new_status,
+    error_message=None
+):
+
+    allowed_statuses = {
+        "queued",
+        "processing",
+        "completed",
+        "failed",
+        "skipped"
+    }
+
+    if new_status not in allowed_statuses:
+        raise ValueError(
+            f"Invalid sync change status: {new_status}"
+        )
+
+    db = SessionLocal()
+
+    try:
+        with db.begin():
+
+            # 1. Retrieve and lock the child record
+            change = (
+                db.query(SyncJobChange)
+                .filter(SyncJobChange.id == change_id)
+                .with_for_update()
+                .first()
+            )
+
+            if not change:
+                raise ValueError(
+                    f"SyncJobChange {change_id} not found"
+                )
+
+            # 2. Retrieve and lock the parent job
+            job = (
+                db.query(SyncJob)
+                .filter(SyncJob.id == change.sync_job_id)
+                .with_for_update()
+                .first()
+            )
+
+            if not job:
+                raise ValueError(
+                    f"SyncJob {change.sync_job_id} not found"
+                )
+
+            now = datetime.now(timezone.utc)
+
+            # 3. Update child status
+            if new_status == "processing":
+
+                # Increment attempts only when starting
+                # a new processing attempt.
+                if change.status != "processing":
+                    change.attempts += 1
+
+                if change.started_at is None:
+                    change.started_at = now
+
+                change.completed_at = None
+                change.error_message = None
+
+                # Update parent status
+                job.status = "processing"
+
+                if job.started_at is None:
+                    job.started_at = now
+
+            elif new_status in (
+                "completed",
+                "failed",
+                "skipped"
+            ):
+
+                change.completed_at = now
+                change.error_message = (
+                    error_message if new_status == "failed"
+                    else None
+                )
+
+            elif new_status == "queued":
+
+                change.completed_at = None
+                change.error_message = error_message
+
+            change.status = new_status
+
+            # 4. Flush the child update
+            db.flush()
+
+            # 5. Recalculate parent progress
+            completed_count = (
+                db.query(func.count(SyncJobChange.id))
+                .filter(
+                    SyncJobChange.sync_job_id == job.id,
+                    SyncJobChange.status == "completed"
+                )
+                .scalar()
+            )
+
+            failed_count = (
+                db.query(func.count(SyncJobChange.id))
+                .filter(
+                    SyncJobChange.sync_job_id == job.id,
+                    SyncJobChange.status == "failed"
+                )
+                .scalar()
+            )
+
+            job.completed_files = completed_count
+            job.failed_files = failed_count
+
+        # Transaction commits automatically
+
+        return True
+
+    finally:
+        db.close()
+
+def finalize_sync_job(sync_job_id):
+
+    db = SessionLocal()
+
+    try:
+        with db.begin():
+
+            # 1. Retrieve and lock the parent job
+            job = (
+                db.query(SyncJob)
+                .filter(SyncJob.id == sync_job_id)
+                .with_for_update()
+                .first()
+            )
+
+            if not job:
+                raise ValueError(
+                    f"Sync job {sync_job_id} not found"
+                )
+
+            # 2. Get counts of individual change statuses
+            status_counts = (
+                db.query(
+                    SyncJobChange.status,
+                    func.count(SyncJobChange.id)
+                )
+                .filter(
+                    SyncJobChange.sync_job_id == sync_job_id
+                )
+                .group_by(SyncJobChange.status)
+                .all()
+            )
+
+            counts = {
+                status: count
+                for status, count in status_counts
+            }
+
+            total = sum(counts.values())
+
+            completed = counts.get("completed", 0)
+            failed = counts.get("failed", 0)
+            skipped = counts.get("skipped", 0)
+
+            # 3. Verify the number of child records
+            if total != job.total_files:
+                raise ValueError(
+                    f"Expected {job.total_files} changes, "
+                    f"but found {total}"
+                )
+
+            # 4. Check whether any changes are unfinished
+            pending = (
+                counts.get("queued", 0)
+                + counts.get("processing", 0)
+            )
+
+            if pending > 0:
+                return None
+
+            # 5. Update parent progress counters
+            job.completed_files = completed
+            job.failed_files = failed
+
+            # 6. Determine final job status
+            if failed == 0:
+                final_status = "completed"
+
+            elif failed == total:
+                final_status = "failed"
+
+            else:
+                final_status = "completed_with_errors"
+
+            # 7. Update final job information
+            now = datetime.now(timezone.utc)
+
+            job.status = final_status
+            job.completed_at = now
+
+            if job.started_at is None:
+                job.started_at = now
+
+            job.locked_by = None
+            job.locked_until = None
+
+        return final_status
+
+    except Exception:
+        raise
 
     finally:
         db.close()

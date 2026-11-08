@@ -19,7 +19,7 @@ from app.rag.services.save_document_and_chunks import save_company_document_and_
 logger = logging.getLogger(__name__)
 
 
-async def add_company_document(change,credentials):
+def add_company_document(change,credentials):
     try:
         downloaded_file = google_drive_service.download_drive_file(
         credentials,
@@ -60,10 +60,10 @@ async def add_company_document(change,credentials):
         document.file_path = file_path
 
         # Parse document
-        parsed_document = await parse_document(document)
+        parsed_document = parse_document(document)
 
         # Chunk document
-        chunks = await chunk_document(
+        chunks = chunk_document(
             parsed_document
         )
 
@@ -91,7 +91,7 @@ async def add_company_document(change,credentials):
         print("chunks - ",chunk_text[0:2000])
 
         # Generate embeddings
-        final_chunks = await generate_embeddings(
+        final_chunks = generate_embeddings(
             chunks
         )
 
