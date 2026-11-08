@@ -42,6 +42,7 @@ def add_company_document(change,credentials):
         file_content = downloaded_file["content"]
         document.file_content = file_content
 
+        print("file downloaded")
         # Upload/store the document
         file_path = upload_document(
             document.file_content,
@@ -59,9 +60,11 @@ def add_company_document(change,credentials):
         # Put file path into the upload object if your parser expects it
         document.file_path = file_path
 
+         print("file uploaded")
         # Parse document
         parsed_document = parse_document(document)
 
+         print("file parsed")
         # Chunk document
         chunks = chunk_document(
             parsed_document
@@ -90,11 +93,13 @@ def add_company_document(change,credentials):
 
         print("chunks - ",chunk_text[0:2000])
 
+        
         # Generate embeddings
         final_chunks = generate_embeddings(
             chunks
         )
 
+        print("embeddings generated")
         # Save document and chunks
         saved_document = save_company_document_and_chunks(
             {

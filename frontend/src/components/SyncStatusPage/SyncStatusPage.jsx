@@ -13,6 +13,7 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
             async function fetchSyncStatus() {
     
                 try {
+                    console.log("status requested");
                     const response = await getSyncStatus(syncJob.sync_job_id)
     
                     if (cancelled) return;

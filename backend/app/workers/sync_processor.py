@@ -44,7 +44,7 @@ def process_sync_job(sync_job_id: int):
 
             # Dispatch according to change type
             if change["change_type"] == "added":
-
+                print("addition start")
                 add_company_document(
                     change,
                     credentials

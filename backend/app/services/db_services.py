@@ -178,6 +178,12 @@ def get_source_by_type(source_type: str):
         return db.query(Source).filter(
             Source.type == source_type
         ).first()
+def get_source_by_id(source_id: int):
+    with SessionLocal() as db:
+        return db.query(Source).filter(
+            Source.id == source_id
+        ).first()
+
 
 
 def update_source(source_id: int, status: str, account_email: str):
