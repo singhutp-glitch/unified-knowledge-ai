@@ -161,7 +161,6 @@ class Message(Base):
         cascade="all, delete-orphan",
     )
 
-
 class Document(Base):
     __tablename__ = "documents"
 
@@ -191,29 +190,36 @@ class Document(Base):
         nullable=False,
     )
 
+    document_type: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="user",
+        server_default="user",
+    )
+
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
         nullable=False,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
 
-    chat_id: Mapped[int] = mapped_column(
+    chat_id: Mapped[int | None] = mapped_column(
         ForeignKey("chats.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
 
-    user: Mapped["User"] = relationship(
+    user: Mapped["User | None"] = relationship(
         back_populates="documents",
     )
 
-    chat: Mapped["Chat"] = relationship(
+    chat: Mapped["Chat | None"] = relationship(
         back_populates="documents",
     )
 
@@ -222,31 +228,72 @@ class Document(Base):
         cascade="all, delete-orphan",
     )
 
+    company_details: Mapped["CompanyDocument | None"] = relationship(
+        back_populates="document",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            """
+            (
+                document_type = 'user'
+                AND user_id IS NOT NULL
+                AND chat_id IS NOT NULL
+            )
+            OR
+            (
+                document_type = 'company'
+                AND user_id IS NULL
+                AND chat_id IS NULL
+            )
+            """,
+            name="check_document_ownership",
+        ),
+    )
+
+    
 class CompanyDocument(Base):
     __tablename__ = "company_documents"
 
-    document_id = Column(
+    document_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("documents.id", ondelete="CASCADE"),
-        primary_key=True
+        primary_key=True,
     )
 
-    source_id = Column(
+    source_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("sources.id"),
-        nullable=False
-    )
-
-    external_file_id = Column(
-        String,
         nullable=False,
-        unique=True
+        index=True,
     )
 
-    external_modified_at = Column(
-        DateTime,
-        nullable=False
+    external_file_id: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
     )
+
+    external_modified_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+    document: Mapped["Document"] = relationship(
+        back_populates="company_details",
+    )
+
+    source: Mapped["Source"] = relationship()
+
+    __table_args__ = (
+        UniqueConstraint(
+            "source_id",
+            "external_file_id",
+            name="uq_company_document_source_file",
+        ),
+    )
+
 
 class Chunk(Base):
     __tablename__ = "chunks"

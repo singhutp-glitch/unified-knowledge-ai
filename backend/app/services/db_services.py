@@ -758,3 +758,49 @@ def get_sync_job_details(sync_job_id, source_id):
 
     finally:
         db.close()
+
+    
+def get_sync_job_for_processing(sync_job_id):
+
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(SyncJob)
+            .filter(SyncJob.id == sync_job_id)
+            .first()
+        )
+
+        if not job:
+            return None
+
+        changes = (
+            db.query(SyncJobChange)
+            .filter(
+                SyncJobChange.sync_job_id == job.id
+            )
+            .order_by(SyncJobChange.id)
+            .all()
+        )
+
+        return {
+            "sync_job_id": job.id,
+            "source_id": job.source_id,
+            "status": job.status,
+            "total_files": job.total_files,
+
+            "changes": [
+                {
+                    "id": change.id,
+                    "external_file_id": change.external_file_id,
+                    "file_name": change.file_name,
+                    "change_type": change.change_type,
+                    "status": change.status,
+                    "attempts": change.attempts
+                }
+                for change in changes
+            ]
+        }
+
+    finally:
+        db.close()

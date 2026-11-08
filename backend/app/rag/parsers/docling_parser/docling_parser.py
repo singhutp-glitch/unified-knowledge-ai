@@ -9,7 +9,7 @@ from app.rag.parsers.docling_parser.extractor import normalize_docling_document
 converter = DocumentConverter()
 
 
-async def parse_docling(file: UploadFile) -> DoclingDocument:
+def parse_docling(file: UploadFile) -> DoclingDocument:
 
     source = DocumentStream(
         name=file.filename,

@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
 
-async def parse_txt(file):
+def parse_txt(file):
 
-    text = (await file.read()).decode("utf-8")
+    text = file.file.read().decode("utf-8")
 
     return {
         "text": text,
