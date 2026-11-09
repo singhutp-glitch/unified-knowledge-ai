@@ -76,11 +76,8 @@ async def handle_sync_message(redis, message_id, fields):
 
     # 3. Execute the actual synchronization job
     try:
-        await asyncio.to_thread(
-            process_sync_job,
-            job_id
-        )
-
+        await process_sync_job(job_id)
+    
     except Exception:
         logger.exception(
             "Error processing sync job %s",

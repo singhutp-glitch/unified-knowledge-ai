@@ -19,7 +19,7 @@ from app.services import google_drive_service
 logger = logging.getLogger(__name__)
 
 
-def add_company_document(change,credentials):
+async def add_company_document(change,credentials):
     try:
         downloaded_file = google_drive_service.download_drive_file(
         credentials,
@@ -105,7 +105,7 @@ def add_company_document(change,credentials):
 
         
         # Generate embeddings
-        final_chunks = generate_embeddings(
+        final_chunks = await generate_embeddings(
             chunks
         )
 

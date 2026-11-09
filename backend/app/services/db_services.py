@@ -4,11 +4,14 @@ from app.services.database import SessionLocal
 from app.models import User
 from app.models import Chat
 from app.models import Message
-from app.models import (Chunk, Source, SourceCredential,CompanyDocument,SyncJob,
+from app.models import (Chunk, Source, SourceCredential,CompanyDocument,Document,SyncJob,
 SyncJobChange)
 from datetime import datetime, timezone, timedelta
 from app.constants import ACTIVE_SYNC_STATUSES,TERMINAL_SYNC_STATUSES
 from sqlalchemy import func
+from sqlalchemy.orm import contains_eager
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 def get_user_by_email(email: str):
     with SessionLocal() as db:
@@ -140,8 +143,7 @@ def save_citations(chunk_results, message_id: int):
     except Exception as error:
         print(error)
 
-from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+
 
 def load_chunk(chunk_id: int):
 
@@ -339,21 +341,25 @@ def update_access_token(
 def get_company_documents_by_source(source_id: int):
     with SessionLocal() as db:
         return (
-            db.query(CompanyDocument)
+            db.query(Document)
+            .join(Document.company_details)
+            .options(contains_eager(Document.company_details))
             .filter(CompanyDocument.source_id == source_id)
             .all()
         )
 
+
 def get_company_document_by_external_file_id(external_file_id: str):
     with SessionLocal() as db:
         return (
-            db.query(CompanyDocument)
+            db.query(Document)
+            .join(Document.company_details)
+            .options(contains_eager(Document.company_details))
             .filter(
                 CompanyDocument.external_file_id == external_file_id
             )
             .first()
         )
-
 
 #sync_job
 

@@ -15,7 +15,7 @@ def calculate_changes(drive_files, company_documents):
     }
 
     document_by_id = {
-        document.external_file_id: document
+        document.company_details.external_file_id: document
         for document in company_documents
     }
 
@@ -41,7 +41,7 @@ def calculate_changes(drive_files, company_documents):
             drive_file["modifiedTime"]
         )
 
-        if document.external_modified_at is None:
+        if document.company_details.external_modified_at is None:
             updated.append({
                 "type": "updated",
                 "file": drive_file
@@ -51,13 +51,13 @@ def calculate_changes(drive_files, company_documents):
 
         # If your DB stores naive UTC datetimes,
         # normalize here before comparison.
-        if drive_modified_at != document.external_modified_at:
+        if drive_modified_at != document.company_details.external_modified_at:
             updated.append({
                 "type": "updated",
                 "file": drive_file
             })
 
-        elif document.name != drive_file["name"]:
+        elif document.original_file_name != drive_file["name"]:
             updated.append({
                 "type": "updated",
                 "file": drive_file
@@ -71,8 +71,8 @@ def calculate_changes(drive_files, company_documents):
             removed.append({
                 "type": "removed",
                 "file": {
-                    "id": document.external_file_id,
-                    "name": document.name
+                    "id": document.company_details.external_file_id,
+                    "name": document.original_file_name
                 }
             })
 

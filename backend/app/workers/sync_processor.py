@@ -7,7 +7,7 @@ remove_company_document)
 
 logger = logging.getLogger(__name__)
 
-def process_sync_job(sync_job_id: int):
+async def process_sync_job(sync_job_id: int):
 
      # 1. Retrieve the job and its associated changes
     job = db_services.get_sync_job_for_processing(
@@ -51,21 +51,21 @@ def process_sync_job(sync_job_id: int):
             # Dispatch according to change type
             if change["change_type"] == "added":
                 print("addition start")
-                add_company_document(
+                await add_company_document(
                     change,
                     credentials
                 )
 
             elif change["change_type"] == "updated":
 
-                update_company_document(
+                await update_company_document(
                     change,
                     credentials
                 )
 
             elif change["change_type"] == "removed":
 
-                remove_company_document(change)
+                await remove_company_document(change)
 
             else:
                 raise ValueError(
