@@ -13,7 +13,7 @@ from app.rag.parsers.parser_factory import parse_document
 from app.rag.chunker.chunk_document import chunk_document
 from app.rag.embeddings.generate_embeddings import generate_embeddings
 from app.rag.services.save_document_and_chunks import save_company_document_and_chunks
-
+from app.services import google_drive_service
 
 
 logger = logging.getLogger(__name__)
@@ -34,13 +34,16 @@ def add_company_document(change,credentials):
             "content-type": downloaded_file["downloaded_mime_type"]
         }))
 
-        modified_at = download_drive_file["modified_time"]
+        modified_at = downloaded_file["modified_time"]
         modified_at = datetime.fromisoformat(
                     modified_at.replace("Z", "+00:00")
                 )
 
         file_content = downloaded_file["content"]
         document.file_content = file_content
+
+        file_size = len(downloaded_file["content"])
+        document.size = file_size
 
         print("file downloaded")
         # Upload/store the document
@@ -59,12 +62,19 @@ def add_company_document(change,credentials):
 
         # Put file path into the upload object if your parser expects it
         document.file_path = file_path
+        print("originalname ", document.filename)
+        print("mimetype ", document.content_type)
+        print("size ", document.size)
+        print("storedFileName ", stored_file_name)
+        print("source_id ",credentials.source_id)
+        print("external_file_id ",change["external_file_id"])
+        print("external_modified_at ",modified_at)
 
-         print("file uploaded")
+        print("file uploaded")
         # Parse document
         parsed_document = parse_document(document)
 
-         print("file parsed")
+        print("file parsed")
         # Chunk document
         chunks = chunk_document(
             parsed_document
@@ -108,7 +118,7 @@ def add_company_document(change,credentials):
                 "size": document.size,
                 "storedFileName": stored_file_name,
                 "source_id":credentials.source_id,
-                "external_file_id":change.external_file_id,
+                "external_file_id":change["external_file_id"],
                 "external_modified_at":modified_at
             },
             chunks

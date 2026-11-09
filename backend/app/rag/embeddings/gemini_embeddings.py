@@ -25,9 +25,9 @@ def gemini_embeddings(texts):
     ]
 
 
-def gemini_query_embedding(text):
+async def gemini_query_embedding(text):
 
-    response = ai.models.embed_content(
+    response = await ai.aio.models.embed_content(
         model="gemini-embedding-2",
         contents=text,
         config=types.EmbedContentConfig(

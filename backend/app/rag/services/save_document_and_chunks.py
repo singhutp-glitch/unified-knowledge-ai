@@ -1,6 +1,6 @@
 from app.services.database import SessionLocal
 from app.rag.services.chunk_service import save_chunks
-from app.models import Document
+from app.models import Document,CompanyDocument
 
 
 def save_document_and_chunks(data, chunks):

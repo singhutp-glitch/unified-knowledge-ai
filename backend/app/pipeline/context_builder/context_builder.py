@@ -1,7 +1,7 @@
 from app.pipeline.context_builder.prompt_builder import build_prompt
 
 
-async def build_context(context):
+def build_context(context):
     contents = [
         {
             "role": (
@@ -30,4 +30,4 @@ async def build_context(context):
     }
 
     context["contents"] = contents
-    print('content inside build_context - ',contents)
+    print('here content inside build_context - ',contents)

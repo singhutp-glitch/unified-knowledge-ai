@@ -6,6 +6,7 @@ from app.features.document_feature.document_search_feature import (
 
 async def build_pipeline_context(context):
     try:
+        print("enter in pipeline")
         features = [
             document_search_feature
         ]
@@ -16,7 +17,8 @@ async def build_pipeline_context(context):
                 async for event in feature["execute"](context):
                     yield event
         print("start build_context")
-        await build_context(context)
+        build_context(context)
 
     except Exception as error:
         print(error)
+        raise

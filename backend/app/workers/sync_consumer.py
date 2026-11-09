@@ -21,7 +21,7 @@ TERMINAL_STATUSES = {
     "cancelled"
 }
 
-PENDING_IDLE_MS = 60 * 1000  # 60 minutes
+PENDING_IDLE_MS = 60*60 * 1000  # 60 minutes
 
 
 async def handle_sync_message(redis, message_id, fields):
@@ -141,7 +141,6 @@ async def consume_sync_jobs(redis):
                 count=1,
                 block=5000
             )
-
             if not messages:
                 continue
 

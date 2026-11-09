@@ -1,5 +1,11 @@
 from app.services import db_services
 import time
+import logging
+from app.workers.document_sync_operations import (add_company_document,update_company_document,
+remove_company_document)
+
+
+logger = logging.getLogger(__name__)
 
 def process_sync_job(sync_job_id: int):
 
