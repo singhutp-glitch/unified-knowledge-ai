@@ -1,5 +1,6 @@
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from datetime import datetime
+from sqlalchemy import Computed
 
 from sqlalchemy import (
     DateTime,
@@ -341,7 +342,11 @@ class Chunk(Base):
     )
 
     search_vector = mapped_column(
-        TSVECTOR
+    TSVECTOR,
+    Computed(
+        "to_tsvector('english', coalesce(text, ''))",
+        persisted=True
+        )
     )
 
     created_at: Mapped[datetime] = mapped_column(

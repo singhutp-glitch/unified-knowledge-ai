@@ -9,9 +9,9 @@ ai = genai.Client(
 )
 
 
-def gemini_embeddings(texts):
+async def gemini_embeddings(texts):
 
-    response = ai.models.embed_content(
+    response = await ai.aio.models.embed_content(
         model="gemini-embedding-2",
         contents=texts,
         config=types.EmbedContentConfig(

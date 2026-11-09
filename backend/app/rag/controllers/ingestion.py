@@ -11,7 +11,7 @@ from app.rag.embeddings.generate_embeddings import generate_embeddings
 from app.rag.services.save_document_and_chunks import save_document_and_chunks
 
 
-def post_upload_document(
+async def post_upload_document(
     document: UploadFile,
     chat_id: int,
     user_id: int
@@ -88,7 +88,7 @@ def post_upload_document(
         print("chunks - ",chunk_text[0:2000])
 
         # Generate embeddings
-        final_chunks = generate_embeddings(
+        final_chunks = await generate_embeddings(
             chunks
         )
 
