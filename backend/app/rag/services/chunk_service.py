@@ -20,3 +20,10 @@ def save_chunks(db, chunks, document):
     db.flush()
 
     return chunk_objects
+
+def delete_chunks(db, document_id: int):
+    return (
+        db.query(Chunk)
+        .filter(Chunk.document_id == document_id)
+        .delete(synchronize_session=False)
+    )

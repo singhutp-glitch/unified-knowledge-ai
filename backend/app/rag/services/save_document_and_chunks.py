@@ -1,5 +1,5 @@
 from app.services.database import SessionLocal
-from app.rag.services.chunk_service import save_chunks
+from app.rag.services.chunk_service import save_chunks,delete_chunks
 from app.models import Document,CompanyDocument
 
 
@@ -70,6 +70,61 @@ def save_company_document_and_chunks(data, chunks):
 
             db.commit()
 
+            db.refresh(document)
+
+            return document
+
+        except Exception:
+            db.rollback()
+            raise
+
+
+def update_company_document_and_chunks(data, chunks):
+
+    with SessionLocal() as db:
+        try:
+            # Find the existing document and its company metadata
+            document = (
+                db.query(Document)
+                .join(CompanyDocument)
+                .filter(
+                    CompanyDocument.source_id == data["source_id"],
+                    CompanyDocument.external_file_id == data["external_file_id"],
+                )
+                .first()
+            )
+
+            if not document:
+                raise ValueError(
+                    "Company document not found for the given source and external file ID"
+                )
+
+            company_document = document.company_details
+
+            # Update existing Document record
+            document.original_file_name = data["originalname"]
+            document.mime_type = data["mimetype"]
+            document.file_size = data["size"]
+            document.stored_file_name = data["storedFileName"]
+
+            # Update existing CompanyDocument record
+            company_document.source_id = data["source_id"]
+            company_document.external_file_id = data["external_file_id"]
+            company_document.external_modified_at = data["external_modified_at"]
+
+            db.flush()
+
+            # Delete previous chunks
+            delete_chunks(db, document.id)
+
+            # Insert newly generated chunks
+            save_chunks(
+                db,
+                chunks,
+                document
+            )
+
+            db.commit()
             db.refresh(document)
 
             return document
