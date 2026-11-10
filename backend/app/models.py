@@ -225,14 +225,17 @@ class Document(Base):
     )
 
     chunks: Mapped[list["Chunk"]] = relationship(
-        back_populates="document",
-        cascade="all, delete-orphan",
-    )
+    back_populates="document",
+    cascade="all, delete-orphan",
+    passive_deletes=True,
+)
 
     company_details: Mapped["CompanyDocument | None"] = relationship(
         back_populates="document",
         uselist=False,
         cascade="all, delete-orphan",
+        single_parent=True,
+        passive_deletes=True,
     )
 
     __table_args__ = (
@@ -306,10 +309,10 @@ class Chunk(Base):
     )
 
     document_id: Mapped[int] = mapped_column(
-        ForeignKey("documents.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
+    ForeignKey("documents.id", ondelete="CASCADE"),
+    nullable=False,
+    index=True,
+)
 
     chunk_index: Mapped[int] = mapped_column(
         Integer,
@@ -360,8 +363,9 @@ class Chunk(Base):
     )
 
     citations: Mapped[list["Citation"]] = relationship(
-        back_populates="chunk",
-    )
+    back_populates="chunk",
+    passive_deletes=True,
+)
 
     __table_args__ = (
         UniqueConstraint(
@@ -392,18 +396,18 @@ class Citation(Base):
         index=True,
     )
 
-    chunk_id: Mapped[int] = mapped_column(
-        ForeignKey("chunks.id"),
-        nullable=False,
-    )
+    chunk_id: Mapped[int | None] = mapped_column(
+    ForeignKey("chunks.id", ondelete="SET NULL"),
+    nullable=True,
+)
 
     message: Mapped["Message"] = relationship(
         back_populates="citations",
     )
 
-    chunk: Mapped["Chunk"] = relationship(
-        back_populates="citations",
-    )
+    chunk: Mapped["Chunk | None"] = relationship(
+    back_populates="citations",
+)
 
     __table_args__ = (
         UniqueConstraint(

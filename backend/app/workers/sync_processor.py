@@ -65,7 +65,7 @@ async def process_sync_job(sync_job_id: int):
 
             elif change["change_type"] == "removed":
 
-                await remove_company_document(change)
+                await remove_company_document(change,job["source_id"])
 
             else:
                 raise ValueError(

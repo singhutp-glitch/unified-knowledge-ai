@@ -1034,3 +1034,36 @@ def finalize_sync_job(sync_job_id):
 
     finally:
         db.close()
+
+
+def get_company_document_for_removal(source_id: int, external_file_id: str):
+    with SessionLocal() as db:
+        return (
+            db.query(Document)
+            .join(Document.company_details)
+            .filter(
+                CompanyDocument.source_id == source_id,
+                CompanyDocument.external_file_id == external_file_id
+            )
+            .first()
+        )
+
+def delete_company_document(source_id: int, external_file_id: str):
+    with SessionLocal() as db:
+        document = (
+            db.query(Document)
+            .join(Document.company_details)
+            .filter(
+                CompanyDocument.source_id == source_id,
+                CompanyDocument.external_file_id == external_file_id
+            )
+            .first()
+        )
+
+        if not document:
+            return False
+
+        db.delete(document)
+        db.commit()
+
+        return True

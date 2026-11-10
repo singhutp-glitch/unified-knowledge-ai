@@ -14,6 +14,7 @@ from app.rag.chunker.chunk_document import chunk_document
 from app.rag.embeddings.generate_embeddings import generate_embeddings
 from app.rag.services.save_document_and_chunks import save_company_document_and_chunks
 from app.services import google_drive_service
+from app.services import db_services
 
 
 logger = logging.getLogger(__name__)
@@ -135,7 +136,7 @@ async def add_company_document(change,credentials):
 
 
 
-def update_company_document(change):
+async def update_company_document(change):
     # Download the updated Google Drive file
     # Extract its content
     # Generate new chunks and embeddings
@@ -144,8 +145,24 @@ def update_company_document(change):
     pass
 
 
-def remove_company_document(change):
-    # Find the existing company document
-    # Remove or deactivate it
-    # Remove its associated chunks and vectors
-    pass
+async def remove_company_document(change,source_id):
+    try:
+        external_file_id = change["external_file_id"]
+
+        document = db_services.get_company_document_for_removal(
+            source_id,
+            external_file_id
+            )
+
+        if document and document.stored_file_name:
+            # storage_service.delete_document(document.stored_file_name)
+            success = db_services.delete_company_document(source_id,external_file_id)
+            print("success - ",success)
+        return success
+    except Exception:
+        logger.exception(
+            "Failed to remove company document: %s",
+            change["external_file_id"]
+        )
+        raise
+    
