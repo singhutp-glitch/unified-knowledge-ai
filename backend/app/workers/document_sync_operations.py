@@ -1,5 +1,6 @@
 from app.services.google_drive_service import download_drive_file
 import io
+import asyncio
 from fastapi import UploadFile
 from starlette.datastructures import Headers
 import os
@@ -73,7 +74,10 @@ async def add_company_document(change,credentials):
 
         print("file uploaded")
         # Parse document
-        parsed_document = parse_document(document)
+        parsed_document = await asyncio.to_thread(
+            parse_document,
+            document
+            )
 
         print("file parsed")
         # Chunk document
