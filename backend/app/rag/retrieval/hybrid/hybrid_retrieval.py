@@ -5,18 +5,24 @@ from app.rag.retrieval.hybrid.rrf import reciprocal_rank_fusion
 
 async def retrieve_hybrid(
     query,
+    knowledge_scope,
     chat_id,
+    user_id,
     top_k=10
 ):
     dense_chunk_results = await retrieve_dense(
         query,
+        knowledge_scope,
         chat_id,
+        user_id,
         20
     )
 
     fulltext_chunk_results = await retrieve_fulltext(
         query,
+        knowledge_scope,
         chat_id,
+        user_id,
         20
     )
 

@@ -40,3 +40,8 @@ def create_access_token(user_id: int) -> str:
         settings.jwt_secret_key,
         algorithm=settings.jwt_algorithm
     )
+
+def verify_secret_admin_code(
+    given_code: str
+) -> bool:
+    return given_code==settings.secret_admin_code

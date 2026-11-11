@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     google_client_secret:str
     google_redirect_uri:str
     redis_url:str
+    secret_admin_code:str
 
 
     model_config = SettingsConfigDict(

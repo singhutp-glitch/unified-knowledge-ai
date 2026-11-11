@@ -27,13 +27,15 @@ def get_user_by_id(user_id: int):
         ).first()
 
 
-def create_user(name: str, email: str, password_hash: str):
+def create_user(name: str, email: str, password_hash: str,is_admin:bool):
     with SessionLocal() as db:
+        role= "admin" if is_admin else "user"
 
         user = User(
             name=name,
             email=email,
-            password_hash=password_hash
+            password_hash=password_hash,
+            role=role
         )
 
         db.add(user)

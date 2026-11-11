@@ -7,6 +7,8 @@ const RegisterPage = ({setAuthMode}) => {
 const [name, setName] = useState("");
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
+const [isAdmin,setIsAdmin] = useState(false);
+const [adminCode, setAdminCode] = useState("");
 const [error, setError] = useState("");
 
 async function handleSubmit(e) {
@@ -30,7 +32,7 @@ if (password.length < 6) {
 }
 
 
-const data = await registerUser(name,email,password);
+const data = await registerUser(name,email,password,isAdmin,adminCode);
 
 setAuthMode('login');
 
@@ -86,6 +88,32 @@ return ( <div className="auth-page">
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
+        <label htmlFor="isAdmin">
+            <input
+                type="checkbox"
+                id="isAdmin"
+                checked={isAdmin}
+                onChange={(e) => setIsAdmin(e.target.checked)}
+            />
+            Create an administrator account
+        </label>
+ 
+
+    {/* Show admin code only when checkbox is selected */}
+    {isAdmin && (
+        
+            <>
+                <label htmlFor="adminCode">Admin Registration Code</label>
+                <input
+                    type="password"
+                    id="adminCode"
+                    placeholder="Enter admin registration code"
+                    value={adminCode}
+                    onChange={(e) => setAdminCode(e.target.value)}
+                    required
+                />
+            </>
+    )}
 
             <button type="submit">
                 Create Account

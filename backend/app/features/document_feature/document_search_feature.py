@@ -32,11 +32,14 @@ async def execute(context):
 
     # Generate embedding for the user's query
     query = context["userPrompt"]
+    print("knowledgeScope - ",context["options"]["knowledgeScope"])
 
     # Retrieve relevant chunks
     chunk_results = await retrieve_hybrid(
         query,
-        context["chatId"]
+        context["options"]["knowledgeScope"],
+        context["chatId"],
+        context["userId"],
     )
 
     # Build text representation of retrieved chunks

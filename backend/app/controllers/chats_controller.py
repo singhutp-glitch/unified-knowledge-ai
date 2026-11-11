@@ -102,6 +102,7 @@ async def send_message(
             prompt = data.message
             print('prompt - ',prompt)
             document_search = data.document_search
+            knowledge_scope = data.knowledge_scope
 
             if not prompt or not prompt.strip():
                 raise HTTPException(
@@ -138,8 +139,10 @@ async def send_message(
                 "userMessages": messages,
                 "userPrompt": prompt,
                 "chatId": chat_id,
+                "userId":user_id,
                 "options": {
-                    "documentSearch": document_search
+                    "documentSearch": document_search,
+                    "knowledgeScope": knowledge_scope
                 },
                 "documentSources": None,
                 "metaData": {},

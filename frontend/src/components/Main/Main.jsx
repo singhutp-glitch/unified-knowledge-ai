@@ -142,6 +142,7 @@ const Main = ({currentChatId,setCurrentChatId,loadChats,messages,setMessages
         await streamMessage(
             chatId,
             documentSearch,
+            knowledgeScope,
             currentPrompt,
             chunk => {
 
@@ -354,14 +355,6 @@ function scrollMessagesToBottom(behavior = "smooth") {
                             📄 {selectedFile.name}
                         </div>
                     )}
-                {knowledgeScope === 'company' &&(
-                    <div className='search-scope-message'>
-                            No company knowledge connect
-                        </div>)}
-                  {knowledgeScope === 'user' &&(
-                    <div className='search-scope-message'>
-                            No user files connected
-                        </div>)}
                {
 
                     showMenu && (

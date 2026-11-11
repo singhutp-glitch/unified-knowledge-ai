@@ -20,6 +20,7 @@ export async function sendMessage(message)
 export async function streamMessage(
     currentChatId,
     documentSearch,
+    knowledgeScope,
     prompt,
     onChunk,
     onDocumentSource,
@@ -40,7 +41,8 @@ export async function streamMessage(
             },
             body: JSON.stringify({
                 message: prompt,
-                documentSearch
+                documentSearch,
+                knowledgeScope
             }),
         }
     );

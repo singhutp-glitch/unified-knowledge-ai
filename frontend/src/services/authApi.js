@@ -1,5 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export async function registerUser(name,email,password){
+export async function registerUser(name,email,password,
+    isAdmin,adminCode){
+        console.log("isadmin in api",isAdmin)
     const response = await fetch(
         `${API_BASE_URL}/auth/register`,
         {
@@ -12,6 +14,8 @@ export async function registerUser(name,email,password){
                 name,
                 email,
                 password,
+                isAdmin,
+                adminCode
             }),
         }
     );

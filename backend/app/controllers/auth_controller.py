@@ -3,7 +3,8 @@ from fastapi import HTTPException
 
 from app.schemas.auth import LoginRequest
 from app.services import db_services
-from app.services.auth_service import verify_password, create_access_token
+from app.services.auth_service import (verify_password, create_access_token,
+verify_secret_admin_code)
 
 from sqlalchemy.orm import Session
 from app.services import db_services
@@ -25,13 +26,22 @@ def signup(
             status_code=400,
             detail="Email already registered"
         )
+    print("is admin in contoller ",data.is_admin)
+    if(data.is_admin):
+        result = verify_secret_admin_code(data.admin_code)
+        if(not result):
+            raise HTTPException(
+            status_code=401,
+            detail="Invalid admin code"
+        )
 
     password_hash = hash_password(data.password)
 
     user = db_services.create_user(
         data.name,
         data.email,
-        password_hash
+        password_hash,
+        data.is_admin
     )
 
     return {

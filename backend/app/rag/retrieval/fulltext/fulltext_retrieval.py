@@ -6,12 +6,16 @@ from app.rag.services.retrieval_service import retrieve_fulltext_chunks
 
 async def retrieve_fulltext(
     query,
+    knowledge_scope,
     chat_id,
+    user_id,
     top_k=10
 ):
     chunk_results = retrieve_fulltext_chunks(
         query,
+        knowledge_scope,
         chat_id,
+        user_id,
         top_k
     )
 

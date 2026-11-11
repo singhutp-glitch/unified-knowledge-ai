@@ -31,14 +31,18 @@ class User(Base):
         primary_key=True,
         autoincrement=True,
     )
+    role: Mapped[str] = mapped_column(
+    String(20),
+    nullable=False,
+    default="user",
+    server_default="user",
+    )
 
     name: Mapped[str] = mapped_column(
         String(100),
         nullable=False,
     )
     
-
-
     email: Mapped[str] = mapped_column(
         String(255),
         unique=True,
