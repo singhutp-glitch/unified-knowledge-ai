@@ -82,6 +82,7 @@ def login(data: LoginRequest):
          "user":{
                 "name":user.name,
                 "email":user.email,
+                "role":user.role
             }
     }
 
@@ -100,7 +101,8 @@ def send_user_info(user_id: int):
         return {
             "id": user.id,
             "name": user.name,
-            "email": user.email
+            "email": user.email,
+            "role": user.role
         }
 
     except HTTPException:

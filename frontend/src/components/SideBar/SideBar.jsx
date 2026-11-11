@@ -31,9 +31,9 @@ const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages
       </div>
         
       {extended?
-        <><div  onClick={handleKowledgeClick} className='company-knowledge'>
+        <>{user.role==='admin'&&<div  onClick={handleKowledgeClick} className='company-knowledge'>
           <p>Company Knowledge</p>
-        </div>
+        </div>}
       <div className="recent">
         <p className='recent-title'>Recent</p>
         {chats.map((chat) => (
