@@ -40,7 +40,7 @@ const SourcePage = ({sourceInfo}) => {
             console.error(
                 "Failed to check active sync",
                 error
-            );
+            )
         }
     }
 
