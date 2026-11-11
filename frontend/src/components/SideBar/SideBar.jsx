@@ -10,11 +10,13 @@ const SideBar = ({user,onLogout,chats,currentChatId,setCurrentChatId,setMessages
   const handleNewChat = ()=>{
     setCurrentChatId(null);
     setMessages([]);
+    setCurrentPage('chatPage')
   }
   const handleChatClick = async(chatId)=>{
     setCurrentChatId(chatId);
     const messages = await getMessages(chatId);
     setMessages(messages);
+    setCurrentPage('chatPage')
   }
   const handleKowledgeClick = ()=>{
     setCurrentPage('adminPage')

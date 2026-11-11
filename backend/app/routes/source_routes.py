@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user,get_current_admin
 from app.controllers import source_controller
 
 from app.schemas.source import (RootFolderRequest, SyncRequest)
@@ -10,7 +10,7 @@ from app.schemas.source import (RootFolderRequest, SyncRequest)
 router = APIRouter( tags=["sources"])
 
 @router.get("/google-drive/connect")
-def connect_google_drive(user_id: int = Depends(get_current_user)):
+def connect_google_drive(user_id: int = Depends(get_current_admin)):
     return source_controller.connect_google_drive(user_id)
 
 @router.get("/google-drive/callback")
@@ -22,27 +22,27 @@ def google_drive_callback(
 
 @router.get("/")
 def get_sources(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.get_sources()
 
 
 @router.delete("/google-drive")
 def disconnect_google_drive(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.disconnect_google_drive()
 
 @router.get("/google-drive/picker-token")
 def get_picker_token(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.get_google_drive_picker_token()
 
 @router.post("/google-drive/root-folder")
 def post_root_folder(
     data: RootFolderRequest,
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.post_google_drive_root_folder(
         data.folder_id,
@@ -51,20 +51,20 @@ def post_root_folder(
 
 @router.delete("/google-drive/root-folder")
 def post_root_folder(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.delete_google_drive_root_folder()
 
 
 @router.get("/google-drive/root-folder")
 def get_root_folder(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.get_google_drive_root_folder()
 
 @router.get("/google-drive/changes")
 def get_source_changes(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.get_google_drive_changes(user_id)
 
@@ -72,13 +72,13 @@ def get_source_changes(
 @router.post("/google-drive/sync")
 def sync_source_changes(
     sync_changes:SyncRequest,
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
     return source_controller.sync_all_google_drive_changes(sync_changes,user_id)
 
 @router.get("/google-drive/active-sync")
 def get_active_google_drive_sync(
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
 
    return source_controller.find_active_google_drive_sync()
@@ -87,7 +87,7 @@ def get_active_google_drive_sync(
 @router.get("/google-drive/sync-status/{sync_job_id}")
 def get_google_drive_sync_status(
     sync_job_id: int,
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_admin)
 ):
 
    return source_controller.find_google_drive_sync_status(sync_job_id)
