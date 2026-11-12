@@ -610,34 +610,6 @@ A multi-step agentic workflow is useful for complex information needs and tasks.
 
 ---
 
-## Relationship to Previous Projects
-
-Unified Knowledge AI builds on capabilities explored in the user's earlier RAG projects:
-
-```text
-Basic AI Knowledge Base
-          │
-          ▼
-Advanced Document Parsing
-          │
-          ▼
-Hybrid Retrieval and Retrieval Experiments
-          │
-          ▼
-       Unified Knowledge AI
-          │
-          ├── Connected knowledge sources
-          ├── Synchronization and lifecycle management
-          ├── Shared knowledge representation
-          ├── Agentic retrieval
-          ├── Tool-assisted analysis and actions
-          └── Evaluation, tracing, and evidence
-```
-
-The goal is to apply document processing and retrieval techniques in a more complete business-oriented application, then extend the system from answering questions to supporting controlled knowledge-intensive work.
-
----
-
 ## Future Extensions
 
 Potential extensions include:
