@@ -434,7 +434,11 @@ class Source(Base):
     root_folder_name = Column(String, nullable=True)
 
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-
+    sync_jobs: Mapped[list["SyncJob"]] = relationship(
+    back_populates="source",
+    cascade="all, delete-orphan",
+    passive_deletes=True,
+)
 
 
 
@@ -464,7 +468,7 @@ class SyncJob(Base):
     # Job ownership and source
     source_id = Column(
         Integer,
-        ForeignKey("sources.id", ondelete="RESTRICT"),
+        ForeignKey("sources.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
@@ -535,7 +539,9 @@ class SyncJob(Base):
         passive_deletes=True
     )
 
-    source = relationship("Source")
+    source: Mapped["Source"] = relationship(
+    back_populates="sync_jobs",
+)
     user = relationship("User")
 
     __table_args__ = (

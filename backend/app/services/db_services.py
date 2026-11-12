@@ -287,18 +287,59 @@ def delete_source_credentials(source_id: int):
 
 
 def delete_source(source_id: int):
+
     with SessionLocal() as db:
-        source = db.query(Source).filter(
-            Source.id == source_id
-        ).first()
+        try:
+            # Find all documents belonging to this source
+            documents = (
+                db.query(Document)
+                .join(Document.company_details)
+                .filter(
+                    CompanyDocument.source_id == source_id
+                )
+                .all()
+            )
 
-        if not source:
-            return None
+            # Delete associated documents
+            for document in documents:
+                db.delete(document)
 
-        db.delete(source)
-        db.commit()
+            # Execute document deletions first
+            db.flush()
 
-        return source
+            # Find and delete the source
+            source = db.get(Source, source_id)
+
+            if source:
+                db.delete(source)
+
+            db.commit()
+
+            return True
+
+        except Exception:
+            db.rollback()
+            raise
+
+def disconnect_source(source_id: int):
+
+    with SessionLocal() as db:
+        try:
+            source = db.get(Source, source_id)
+
+            if not source:
+                return False
+
+            source.is_connected = False
+
+            # Delete associated credentials here
+
+            db.commit()
+            return True
+
+        except Exception:
+            db.rollback()
+            raise
 
 def update_source_root_folder(source_id: int, folder_id: str|None, folder_name: str|None):
     with SessionLocal() as db:

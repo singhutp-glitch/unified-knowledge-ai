@@ -59,24 +59,77 @@ const SyncStatusPage = ({syncJob,setSyncJob}) => {
             };
     
         }, [syncJob?.sync_job_id]);
-  return (
+ const progress = syncJob && syncJob.total_files > 0
+    ? Math.min(
+        (syncJob.completed_files / syncJob.total_files) * 100,
+        100
+      )
+    : 0;
+
+return (
     <div className="sync-status-page">
-          <h2>Synchronization Status</h2>
 
-            {syncJob ? (
-                <div>
-                    <p>Status: {syncJob.status}</p>
+        {syncJob ? (
 
-                    <p>
-                        Completed: {syncJob.completed_files}
-                        / {syncJob.total_files}
-                    </p>
+            <div className="sync-status-content">
+                    <h2>Synchronization Status</h2>
+
+
+                <div className="sync-status-info">
+
+                    <div className="sync-status-label">
+                        Current Status
+                    </div>
+
+                    <div className={`sync-status-value status-${syncJob.status}`}>
+                        {syncJob.status.replaceAll("_", " ")}
+                    </div>
+
                 </div>
-            ) : (
+
+                <div className="sync-progress-section">
+
+                    <div className="sync-progress-heading">
+
+                        <span>Progress</span>
+
+                        <span>
+                            {syncJob.completed_files} / {syncJob.total_files} completed
+                        </span>
+
+                    </div>
+
+                    <div className="sync-progress-bar">
+
+                        <div
+                            className="sync-progress-fill"
+                            style={{ width: `${progress}%` }}
+                        />
+
+                    </div>
+
+                    <div className="sync-progress-percentage">
+                        {Math.round(progress)}%
+                    </div>
+
+                </div>
+
+            </div>
+
+        ) : (
+
+            <div className="sync-status-empty">
                 <p>No synchronization yet</p>
-            )}
-        </div>
-  )
+                <span>
+                    Run a synchronization from the Checkout section
+                    to see its progress here.
+                </span>
+            </div>
+
+        )}
+
+    </div>
+);
 }
 
 export default SyncStatusPage
