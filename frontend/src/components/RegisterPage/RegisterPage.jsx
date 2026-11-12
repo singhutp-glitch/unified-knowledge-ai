@@ -44,11 +44,10 @@ return ( <div className="auth-page">
 
         <div className="auth-header">
 
-            <h1>Knowledge Workspace</h1>
+            <h1>Unified Knowledge AI</h1>
 
             <p>
-                Enterprise document intelligence with grounded answers and
-                verifiable citations.
+               organizational knowledge to actionable work with intelligent retrieval, AI-powered tools and verifiable results.
             </p>
 
         </div>

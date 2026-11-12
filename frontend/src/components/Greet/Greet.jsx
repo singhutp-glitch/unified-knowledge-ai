@@ -1,78 +1,90 @@
 import React from "react";
 import "./Greet.css";
 import { assets } from "../../assets/assets";
-
 const Greet = () => {
     return (
         <div className="greet-page">
 
             <div className="hero">
 
-                <h1>Knowledge Workspace</h1>
+                <h1>Unified Knowledge AI</h1>
 
                 <p>
-                    Search, analyze and verify information across your organization's
-                    documents. Every answer is grounded in retrieved sources and backed
-                    by citations you can inspect.
+                    Turn organizational knowledge into actionable work.
+                    Search across connected sources, analyze information,
+                    and use AI-powered tools to move tasks forward with
+                    grounded answers and verifiable results.
                 </p>
 
             </div>
 
-           <div className="workflow-section">
+            <div className="workflow-section">
 
-    <h2>How it works</h2>
+                <h2>How it works</h2>
 
-    <div className="workflow">
+                <div className="workflow">
 
-        <div className="workflow-step">
+                    <div className="workflow-step">
 
-            <img src={assets.plus_icon} alt="" />
+                        <img src={assets.plus_icon} alt="" />
 
-            <h3>Upload Documents</h3>
+                        <h3>Connected Knowledge</h3>
 
-            <p>Add PDFs to your knowledge workspace.</p>
+                        <p>
+                            Access information across your organization's
+                            connected documents and knowledge sources.
+                        </p>
 
-        </div>
+                    </div>
 
-        <div className="workflow-arrow">→</div>
+                    <div className="workflow-arrow">→</div>
 
-        <div className="workflow-step">
+                    <div className="workflow-step">
 
-            <img src={assets.compass_icon} alt="" />
+                        <img src={assets.compass_icon} alt="" />
 
-            <h3>Semantic Retrieval</h3>
+                        <h3>Contextual Retrieval</h3>
 
-            <p>Relevant passages are retrieved for every query.</p>
+                        <p>
+                            Retrieve and combine relevant information
+                            to build context for your questions and tasks.
+                        </p>
 
-        </div>
+                    </div>
 
-        <div className="workflow-arrow">→</div>
+                    <div className="workflow-arrow">→</div>
 
-        <div className="workflow-step">
+                    <div className="workflow-step">
 
-            <img src={assets.message_icon} alt="" />
+                        <img src={assets.message_icon} alt="" />
 
-            <h3>Grounded Answer</h3>
+                        <h3>Tool-assisted Work</h3>
 
-            <p>The model answers using only retrieved evidence.</p>
+                        <p>
+                            Use AI-powered tools to analyze information
+                            and carry out multi-step tasks.
+                        </p>
 
-        </div>
+                    </div>
 
-        <div className="workflow-arrow">→</div>
+                    <div className="workflow-arrow">→</div>
 
-        <div className="workflow-step">
+                    <div className="workflow-step">
 
-            <img src={assets.code_icon} alt="" />
+                        <img src={assets.code_icon} alt="" />
 
-            <h3>Source Verification</h3>
+                        <h3>Evidence & Verification</h3>
 
-            <p>Inspect every citation and supporting document.</p>
+                        <p>
+                            Inspect supporting sources and verify
+                            answers and task results.
+                        </p>
 
-        </div>
+                    </div>
 
-    </div>
+                </div>
 
-</div>
+            </div>
 
         </div>
     );
