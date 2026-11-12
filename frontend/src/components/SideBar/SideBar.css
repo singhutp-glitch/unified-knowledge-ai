@@ -41,7 +41,7 @@
 }
 
 .side-bar .company-knowledge{
-    margin-top:50px;
+    margin-top:10px;
     display: flex;
     align-items: center;
     gap:10px;
@@ -51,6 +51,7 @@
     font-size: 14px;
     color: gray;
     cursor: pointer;
+    height: 48px;
 }
 
 .side-bar .recent{
